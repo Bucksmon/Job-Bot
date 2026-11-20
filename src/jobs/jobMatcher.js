@@ -7,9 +7,12 @@ function normalize(value = "") {
 
 function titleMatches(jobTitle, preferredTitles) {
   const title = normalize(jobTitle);
+
+  if (!title) return false;
+
   return preferredTitles.some((preferredTitle) => {
     const target = normalize(preferredTitle);
-    return title.includes(target) || target.includes(title);
+    return target && (title.includes(target) || target.includes(title));
   });
 }
 
