@@ -3,7 +3,6 @@ import { EmbedBuilder, REST, Routes } from "discord.js";
 function createJobEmbed(job) {
   const embed = new EmbedBuilder()
     .setTitle((job.title || "Untitled role").slice(0, 256))
-    .setURL(job.url)
     .setDescription((job.description || "No description provided.").slice(0, 1200))
     .addFields(
       { name: "Company", value: job.company || "Not provided", inline: true },
@@ -11,6 +10,11 @@ function createJobEmbed(job) {
       { name: "Match", value: `${job.matchScore ?? 0}%`, inline: true }
     )
     .setFooter({ text: "Job Filter · Resume match" });
+
+  // Discord only accepts a valid URL for the embed link.
+  if (job.url && /^https?:\/\//i.test(job.url)) {
+    embed.setURL(job.url);
+  }
 
   if (Array.isArray(job.matchedSkills) && job.matchedSkills.length > 0) {
     embed.addFields({
