@@ -41,3 +41,13 @@ test("rejects a matching role with too few resume skill matches", () => {
 
   assert.equal(result.relevant, false);
 });
+
+test("does not treat a missing job title as a preferred-title match", () => {
+  const result = isRelevantJob({
+    location: "Dubai, UAE",
+    description: "JavaScript, React, Node.js, MongoDB and Python."
+  }, profile);
+
+  assert.equal(result.titleMatch, false);
+  assert.equal(result.relevant, false);
+});
