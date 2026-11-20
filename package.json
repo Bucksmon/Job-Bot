@@ -1,0 +1,22 @@
+{
+  "name": "job-filter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A local resume-based job discovery and Discord notification tool.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord.js": "^14.24.2",
+    "dotenv": "^16.4.7",
+    "mammoth": "^1.9.1",
+    "pdf-parse": "^1.1.1",
+    "better-sqlite3": "^12.4.1"
+  }
+}
