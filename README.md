@@ -1,22 +1,21 @@
 # Job Filter
 
-A small, local Node.js application that checks job postings against your resume and sends relevant matches to Discord.
+A small, local Node.js application that filters job listings against a resume and sends relevant matches to Discord.
 
-## Scope
+## What it does
 
-This project intentionally focuses on three things:
+1. Reads a local PDF or DOCX resume.
+2. Extracts technical skills using a small, editable keyword dictionary.
+3. Scores job listings against preferred roles, skills, location and experience level.
+4. Sends relevant, non-duplicate listings to one Discord channel (notification integration is a later milestone).
 
-1. Read a local PDF or DOCX resume and extract useful skills and job titles.
-2. Discover publicly accessible job postings and filter out irrelevant results.
-3. Send relevant, non-duplicate listings to one Discord channel.
-
-There is no resume builder, application automation, email integration, hosted dashboard, or machine-learning training pipeline.
+No resume builder, email integration, application automation, hosted dashboard or machine-learning training pipeline.
 
 ## Requirements
 
 - Node.js 20 or newer
-- A Discord bot token and a channel ID
 - A local PDF or DOCX resume
+- A Discord bot token and channel ID (needed when Discord notifications are added)
 
 ## Setup
 
@@ -24,20 +23,34 @@ There is no resume builder, application automation, email integration, hosted da
 npm install
 ```
 
-Copy `.env.example` to `.env`, then configure your Discord bot token and channel ID.
+Copy `.env.example` to `.env`, then edit the search preferences. Place your resume at `data/resume.pdf`, or change `RESUME_PATH`.
 
-Place your resume at `data/resume.pdf` (or update `RESUME_PATH`).
+Extract and preview the profile:
+
+```bash
+npm run profile
+```
+
+Run the matching tests:
+
+```bash
+npm test
+```
+
+## Job discovery and LinkedIn
+
+LinkedIn does not provide a general public API for searching and exporting job listings. Its User Agreement also prohibits automated scraping/copying of its services. This project will not automate LinkedIn login sessions, scrape LinkedIn pages, or bypass access controls.
+
+The discovery layer will be kept separate from the resume matcher so it can connect to an authorized job-data source. If an authorized LinkedIn integration becomes available, it can be added without changing the matching logic.
 
 ## Development status
 
-The repository is being built in small milestones. Job discovery will use accessible, permitted job-listing sources. The application will not automate LinkedIn login sessions or bypass access controls.
-
-## Planned milestones
-
-- [ ] Resume text extraction
-- [ ] Basic skill and role profile extraction
-- [ ] Job source adapter
-- [ ] Simple relevance scoring
-- [ ] SQLite duplicate prevention
+- [x] Local PDF/DOCX text extraction
+- [x] Basic skill profile extraction
+- [x] Configurable role and location preferences
+- [x] Rule-based relevance scoring
+- [x] Initial matching tests
+- [ ] Job discovery source
+- [ ] Duplicate prevention
 - [ ] Discord notifications
-- [ ] Local Search button / desktop interface
+- [ ] Minimal local Search interface
