@@ -25,12 +25,14 @@ const skillAliases = {
 };
 
 function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
 }
 
 function containsTerm(text, term) {
   const escaped = escapeRegExp(term.toLowerCase());
-  const expression = new RegExp(`(^|[^a-z0-9+#.])${escaped}($|[^a-z0-9+#.])`, "i");
+
+  // Treat punctuation (like a period at the end of a sentence) as a word boundary.
+  const expression = new RegExp(`(^|[^a-z0-9+#])${escaped}($|[^a-z0-9+#])`, "i");
   return expression.test(text);
 }
 
