@@ -24,23 +24,34 @@ const skillAliases = {
   "Next.js": ["next.js", "nextjs"]
 };
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+function isWordCharacter(character) {
+  return Boolean(character) && /[a-z0-9+#]/i.test(character);
 }
 
 function containsTerm(text, term) {
-  const escaped = escapeRegExp(term.toLowerCase());
+  let index = text.indexOf(term);
 
-  // Treat punctuation (like a period at the end of a sentence) as a word boundary.
-  const expression = new RegExp(`(^|[^a-z0-9+#])${escaped}($|[^a-z0-9+#])`, "i");
-  return expression.test(text);
+  while (index !== -1) {
+    const before = text[index - 1] || "";
+    const after = text[index + term.length] || "";
+
+    if (!isWordCharacter(before) && !isWordCharacter(after)) {
+      return true;
+    }
+
+    index = text.indexOf(term, index + 1);
+  }
+
+  return false;
 }
 
 export function extractProfile(resumeText, preferences) {
   const normalizedText = resumeText.toLowerCase();
 
   const skills = Object.entries(skillAliases)
-    .filter(([, aliases]) => aliases.some((alias) => containsTerm(normalizedText, alias)))
+    .filter(([, aliases]) =>
+      aliases.some((alias) => containsTerm(normalizedText, alias.toLowerCase()))
+    )
     .map(([skill]) => skill);
 
   return {
