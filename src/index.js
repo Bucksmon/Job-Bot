@@ -1,20 +1,7 @@
 import "dotenv/config";
 
-console.log("Job Filter is starting...");
-
-const requiredSettings = [
-  "DISCORD_BOT_TOKEN",
-  "DISCORD_CHANNEL_ID"
-];
-
-const missingSettings = requiredSettings.filter((key) => !process.env[key]);
-
-if (missingSettings.length > 0) {
-  console.log("\nMissing configuration:");
-  missingSettings.forEach((key) => console.log(`- ${key}`));
-  console.log("\nCopy .env.example to .env and fill in the required values.");
-  process.exit(1);
-}
-
-console.log("Configuration loaded.");
-console.log("The application foundation is ready for the first development milestone.");
+console.log("Job Filter");
+console.log("----------");
+console.log("Local project setup is ready.");
+console.log("Run 'npm run profile' to read the configured resume.");
+console.log("Run 'npm test' to check the matching rules.");
