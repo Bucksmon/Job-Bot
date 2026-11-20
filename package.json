@@ -7,7 +7,9 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "profile": "node src/resume/cli.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
@@ -16,7 +18,6 @@
     "discord.js": "^14.24.2",
     "dotenv": "^16.4.7",
     "mammoth": "^1.9.1",
-    "pdf-parse": "^1.1.1",
-    "better-sqlite3": "^12.4.1"
+    "pdf-parse": "^1.1.1"
   }
 }
