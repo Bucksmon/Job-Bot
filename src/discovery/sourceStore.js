@@ -1,13 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const blockedHosts = ["linkedin.com", "indeed.com"];
-
 function isBlockedHost(hostname) {
-  const host = hostname.toLowerCase();
-  return blockedHosts.some((blocked) =>
-    host === blocked || host.endsWith(`.${blocked}`)
-  );
+  // Covers regional domains such as indeed.ae and LinkedIn country domains.
+  return /(^|\.)(linkedin|indeed)\.[a-z.]+$/i.test(hostname);
 }
 
 export function validateSourceUrl(value) {
@@ -24,7 +20,7 @@ export function validateSourceUrl(value) {
   }
 
   if (isBlockedHost(url.hostname)) {
-    throw new Error("This source cannot be automated. Add a public employer career page that permits automated access instead.");
+    throw new Error("LinkedIn and Indeed are not supported for automated crawling. Add a public employer career page that permits automated access instead.");
   }
 
   if (
