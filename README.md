@@ -17,8 +17,8 @@ Upload a PDF or DOCX resume, paste a job description, review the keyword alignme
 1. Extracts text from a PDF or DOCX resume.
 2. Finds recognised skills and terms in the job description.
 3. Shows keyword overlap, missing terms, and resume evidence.
-4. Creates a cautious professional-summary draft based only on the supplied resume.
-5. Exports an editable DOCX draft while preserving the extracted original resume text.
+4. Creates an editable professional-summary draft based only on the supplied resume.
+5. Exports a DOCX draft with relevant keywords, existing evidence, and original resume content.
 
 The match percentage is an indicative keyword-alignment estimate. It is not a score from a specific ATS vendor and cannot guarantee that an application will pass an ATS.
 
@@ -34,7 +34,7 @@ cp .env.example .env
 npm start
 ```
 
-The API listens on port 10000 by default. For local frontend testing, use a static server to serve the `site` folder and configure `site/config.js` with:
+The API listens on port 10000 by default. For local frontend testing, serve the `site` folder with a static server and change `site/config.js` to:
 
 ```js
 window.JOBBOT_API_BASE = "http://localhost:10000";
@@ -50,23 +50,27 @@ npm test
 
 The root `render.yaml` defines a Node.js web service.
 
-1. Create a Render Blueprint from this repository, or create a Web Service connected to this repository.
-2. Use the repository root as the service root.
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Health check path: `/api/health`
-6. Set `FRONTEND_ORIGINS` to your GitHub Pages origin.
+1. Connect GitHub to Render. In Render **Account Settings → Git Deployment Credentials**, add GitHub and authorize access to this repository.
+2. If Render uses its GitHub App, make sure `Bucksmon/Job-Bot` is included in the app installation's repository access list.
+3. Create a Blueprint from this repository, or create a Web Service connected to it.
+4. Use the repository root as the service root.
+5. Build command: `npm install`
+6. Start command: `npm start`
+7. Health check path: `/api/health`
+8. Set `FRONTEND_ORIGINS` to the exact GitHub Pages origin (origin only, without a path).
 
-The free Render web-service plan can spin down after inactivity; the first request after a spin-down may take around a minute to wake the service. Upgrade the service plan to avoid this limitation.
+After Render creates the service, copy its actual `onrender.com` URL into `site/config.js` as `window.JOBBOT_API_BASE`, then push that change.
+
+The free Render web-service plan can spin down after 15 minutes of inactivity; the first request after a spin-down can take around a minute to wake the service. Upgrade the service plan to avoid this limitation.
 
 ## Deploy the frontend to GitHub Pages
 
-1. Open **Settings → Pages** in the repository.
-2. Set the publishing source to **GitHub Actions**.
-3. Update `site/config.js` with the actual Render API URL.
-4. Push to `main`; `.github/workflows/pages.yml` publishes the `site` folder.
+1. Open repository **Settings → Pages**.
+2. Under **Build and deployment**, set the source to **GitHub Actions**.
+3. Push to `main`; `.github/workflows/pages.yml` publishes the `site` folder.
+4. Check the Actions tab for the Pages deployment URL.
 
-For a private repository, GitHub Pages availability depends on the GitHub plan. If the Pages settings do not allow publishing, make the repository public or use a plan that supports Pages for private repositories.
+GitHub Pages is available for public repositories on GitHub Free. A private repository requires GitHub Pro, Team, or Enterprise. If the Pages setting is unavailable for this private repository, either upgrade the GitHub plan or publish the static `site` folder from a separate public repository. The API can remain private.
 
 ## Privacy
 
