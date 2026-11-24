@@ -6,7 +6,7 @@ services:
     region: frankfurt
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    autoDeploy: true
+    autoDeployTrigger: commit
     disk:
       name: job-bot-data
       mountPath: /var/data
@@ -22,8 +22,12 @@ services:
         sync: false
       - key: ALLOWED_DISCORD_USER_ID
         sync: false
+      - key: RESUME_DIRECTORY
+        value: /var/data
       - key: RESUME_PATH
         value: /var/data/resume.pdf
+      - key: RESUME_METADATA_PATH
+        value: /var/data/resume-meta.json
       - key: JOB_HISTORY_PATH
         value: /var/data/sent-jobs.json
       - key: JOB_SOURCES_PATH
