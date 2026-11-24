@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import { extractResumeDocument, buildResumeAudit } from "./lib/resumeParser.js";
 import { analyzeResume, buildDocumentData } from "./lib/analyzer.js";
 import { createTailoredResumePdf } from "./lib/pdfExporter.js";
+import { searchEmployerJobs } from "./lib/jobSearch.js";
 
 const app = express();
 // Render sits behind one trusted reverse proxy; this enables correct client IP rate limiting.
@@ -54,6 +55,18 @@ const upload = multer({
 
 app.get("/api/health", (_request, response) => {
   response.json({ status: "ok", service: "ats-resume-matcher" });
+});
+
+app.get("/api/jobs", apiLimiter, async (request, response, next) => {
+  try {
+    const query = String(request.query.q || "").trim().slice(0, 100);
+    const location = String(request.query.location || "Dubai, UAE").trim().slice(0, 100);
+    const result = await searchEmployerJobs({ query, location, limit: 40 });
+    response.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+    return response.json(result);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post("/api/analyze", apiLimiter, upload.single("resume"), async (request, response, next) => {
