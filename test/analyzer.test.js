@@ -88,3 +88,15 @@ test("recognises soft-skill synonyms without requiring exact phrasing", () => {
   assert.ok(result.matchedKeywords.includes("Problem Solving"));
   assert.ok(result.score > 0);
 });
+
+test("recognises security and operations role keywords", () => {
+  const result = analyzeResume({
+    resumeText: "Worked as a security officer monitoring CCTV, managing access control, patrolling premises and writing incident reports. Certified in first aid and fire safety.",
+    jobDescription: "Security guard required. Duties include CCTV monitoring, access control, patrolling, incident reporting, first aid and fire safety.",
+    jobTitle: "Security Guard"
+  });
+  assert.ok(result.score > 0);
+  assert.ok(result.matchedKeywords.includes("CCTV"));
+  assert.ok(result.matchedKeywords.includes("Access Control"));
+  assert.ok(result.matchedKeywords.includes("First Aid"));
+});
