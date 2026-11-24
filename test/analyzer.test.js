@@ -100,3 +100,52 @@ test("recognises security and operations role keywords", () => {
   assert.ok(result.matchedKeywords.includes("Access Control"));
   assert.ok(result.matchedKeywords.includes("First Aid"));
 });
+
+
+test("does not inject generic filler if the source has no summary evidence", () => {
+  const result = analyzeResume({
+    resumeText: "Furqan Nadir\nfurqan@example.com\nA resume without recognised technologies or achievement statements.",
+    jobDescription: "Required: Kubernetes, Azure and Terraform experience.",
+    jobTitle: "Cloud Engineer"
+  });
+
+  assert.equal(result.summaryDraft, "");
+});
+
+test("replaces an old placeholder with genuine resume evidence", () => {
+  const result = analyzeResume({
+    resumeText: [
+      "Furqan Nadir",
+      "PROFESSIONAL SUMMARY",
+      "Candidate targeting Backend Software Engineer. Add a concise summary of relevant experience and verified strengths from your resume before applying.",
+      "PROFESSIONAL EXPERIENCE",
+      "- Built REST APIs using Node.js and Express.js for an internal platform.",
+      "The platform handled 50,000 requests per day and reduced response latency by 30%."
+    ].join("\n"),
+    jobDescription: "Required qualifications:\n- Node.js and Express.js experience building REST APIs.",
+    jobTitle: "Backend Software Engineer"
+  });
+
+  assert.match(result.summaryDraft, /Node.js/);
+  assert.match(result.summaryDraft, /50,000 requests per day/);
+  assert.doesNotMatch(result.summaryDraft, /Candidate targeting/);
+  assert.doesNotMatch(result.summaryDraft, /Add a concise summary/);
+});
+
+test("classifies skills under required and preferred headings", () => {
+  const result = analyzeResume({
+    resumeText: "JavaScript, Node.js",
+    jobDescription: [
+      "Required qualifications:",
+      "- JavaScript and Node.js experience.",
+      "",
+      "Preferred:",
+      "- Docker and AWS knowledge."
+    ].join("\n"),
+    jobTitle: "Backend Developer"
+  });
+
+  assert.deepEqual(result.requiredKeywords, ["JavaScript", "Node.js"]);
+  assert.deepEqual(result.matchedRequired, ["JavaScript", "Node.js"]);
+  assert.deepEqual(result.matchedPreferred, []);
+});
