@@ -58,8 +58,8 @@ test("exports an ATS-readable PDF using the source page dimensions", async () =>
   assert.match(parsed.text, /Bucksmon/);
   assert.match(parsed.text, /RELEVANT SKILLS/i);
   assert.match(parsed.text, /JavaScript/);
-  assert.match(parsed.text, /Professional Experience/);
-  assert.match(parsed.text, /Education/);
+  assert.match(parsed.text, /PROFESSIONAL EXPERIENCE/i);
+  assert.match(parsed.text, /EDUCATION/i);
 });
 
 test("never inserts a missing skill that is not in the supplied resume", async () => {
