@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import multer from "multer";
 import rateLimit from "express-rate-limit";
-import { extractResumeText } from "./lib/resumeParser.js";
+import { extractResumeDocument, buildResumeAudit } from "./lib/resumeParser.js";
 import { analyzeResume, buildDocumentData } from "./lib/analyzer.js";
 import { createTailoredResumePdf } from "./lib/pdfExporter.js";
 
@@ -77,11 +77,13 @@ app.post("/api/analyze", apiLimiter, upload.single("resume"), async (request, re
       });
     }
 
-    const resumeText = await extractResumeText(request.file);
+    const resumeDocument = await extractResumeDocument(request.file);
+    const resumeText = resumeDocument.text;
     const analysis = analyzeResume({ resumeText, jobDescription, jobTitle });
 
     return response.json({
       analysis,
+      resumeAudit: buildResumeAudit(resumeDocument),
       documentData: buildDocumentData({ analysis, resumeText })
     });
   } catch (error) {
