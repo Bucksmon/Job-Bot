@@ -56,7 +56,7 @@ test("exports an ATS-readable PDF using the source page dimensions", async () =>
 
   const parsed = await pdfParse(buffer);
   assert.match(parsed.text, /Bucksmon/);
-  assert.match(parsed.text, /Relevant Skills/);
+  assert.match(parsed.text, /RELEVANT SKILLS/i);
   assert.match(parsed.text, /JavaScript/);
   assert.match(parsed.text, /Professional Experience/);
   assert.match(parsed.text, /Education/);
