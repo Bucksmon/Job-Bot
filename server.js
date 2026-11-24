@@ -8,6 +8,8 @@ import { analyzeResume, buildDocumentData } from "./lib/analyzer.js";
 import { createTailoredResumeDocx } from "./lib/docxExporter.js";
 
 const app = express();
+// Render sits behind one trusted reverse proxy; this enables correct client IP rate limiting.
+app.set("trust proxy", 1);
 const port = Number(process.env.PORT || 10000);
 const maxUploadMb = Math.max(1, Number(process.env.MAX_UPLOAD_MB || 8));
 
@@ -118,6 +120,7 @@ app.post("/api/export", apiLimiter, async (request, response, next) => {
       missingKeywords: Array.isArray(data.missingKeywords)
         ? data.missingKeywords.slice(0, 60).map(String)
         : [],
+      notes: Array.isArray(data.notes) ? data.notes.slice(0, 20).map(String) : [],
       resumeText: data.resumeText
     });
 
