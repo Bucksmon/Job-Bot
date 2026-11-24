@@ -144,7 +144,32 @@ function renderResults(payload) {
     }
   }
 
-  summaryDraft.value = analysis.summaryDraft;
+  const auditList = document.querySelector("#audit-list");
+  auditList.replaceChildren();
+
+  for (const check of payload.resumeAudit?.checks || []) {
+    const item = document.createElement("li");
+    item.className = "audit-item " + check.status;
+
+    const status = document.createElement("span");
+    status.className = "audit-status";
+    status.textContent = check.status === "pass" ? "PASS" :
+      check.status === "review" ? "REVIEW" : "INFO";
+
+    const body = document.createElement("div");
+    const heading = document.createElement("strong");
+    heading.textContent = check.label;
+    const detail = document.createElement("p");
+    detail.textContent = check.detail;
+    body.append(heading, detail);
+    item.append(status, body);
+    auditList.append(item);
+  }
+
+  summaryDraft.value = analysis.summaryDraft || "";
+  summaryDraft.placeholder = analysis.summaryDraft
+    ? ""
+    : "No evidence-based summary could be generated from the source resume. Add a truthful summary here, or keep your original summary in the CV.";
   currentDocumentData = payload.documentData;
   document.querySelector("#method-note").textContent = analysis.notes.join(" ");
   resultsSection.hidden = false;
