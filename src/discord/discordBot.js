@@ -1,15 +1,9 @@
 import "dotenv/config";
-import fs from "node:fs/promises";
-import path from "node:path";
-import {
-  Client,
-  GatewayIntentBits,
-  REST,
-  Routes,
-  SlashCommandBuilder
-} from "discord.js";
+import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } from "discord.js";
 import { addSource, listSources } from "../discovery/sourceStore.js";
 import { runSearch } from "../jobs/searchService.js";
+import { markJobApplied } from "../jobs/jobStore.js";
+import { saveResumeBuffer } from "../resume/resumeStorage.js";
 
 const commands = [
   new SlashCommandBuilder()
@@ -36,6 +30,12 @@ const commands = [
     .setName("sources")
     .setDescription("Show configured career-page sources."),
   new SlashCommandBuilder()
+    .setName("mark-applied")
+    .setDescription("Mark a job sent by Job-Bot as applied.")
+    .addStringOption((option) =>
+      option.setName("url").setDescription("Original job posting URL").setRequired(true)
+    ),
+  new SlashCommandBuilder()
     .setName("help")
     .setDescription("Show Job-Bot commands.")
 ];
@@ -46,12 +46,6 @@ function isOwner(interaction) {
 }
 
 async function saveResume(attachment) {
-  const extension = path.extname(attachment.name || "").toLowerCase();
-
-  if (![".pdf", ".docx"].includes(extension)) {
-    throw new Error("Upload a PDF or DOCX resume.");
-  }
-
   if (attachment.size > 8 * 1024 * 1024) {
     throw new Error("Resume must be smaller than 8 MB.");
   }
@@ -62,32 +56,33 @@ async function saveResume(attachment) {
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());
-  const destination = process.env.RESUME_PATH || "./data/resume.pdf";
-
-  await fs.mkdir(path.dirname(path.resolve(destination)), { recursive: true });
-  await fs.writeFile(destination, buffer);
-  return destination;
+  return saveResumeBuffer(buffer, attachment.name);
 }
 
 export async function startDiscordBot() {
   const token = process.env.DISCORD_BOT_TOKEN;
   const guildId = process.env.DISCORD_GUILD_ID;
+  const channelId = process.env.DISCORD_CHANNEL_ID;
 
-  if (!token || !guildId || !process.env.ALLOWED_DISCORD_USER_ID) {
-    throw new Error("Set DISCORD_BOT_TOKEN, DISCORD_GUILD_ID and ALLOWED_DISCORD_USER_ID.");
+  if (!token || !guildId || !channelId || !process.env.ALLOWED_DISCORD_USER_ID) {
+    throw new Error("Set DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, DISCORD_CHANNEL_ID and ALLOWED_DISCORD_USER_ID.");
   }
 
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
   client.once("ready", async () => {
-    const rest = new REST({ version: "10" }).setToken(token);
+    try {
+      const rest = new REST({ version: "10" }).setToken(token);
 
-    await rest.put(
-      Routes.applicationGuildCommands(client.application.id, guildId),
-      { body: commands.map((command) => command.toJSON()) }
-    );
+      await rest.put(
+        Routes.applicationGuildCommands(client.application.id, guildId),
+        { body: commands.map((command) => command.toJSON()) }
+      );
 
-    console.log(`Discord bot ready as ${client.user.tag}`);
+      console.log(`Discord bot ready as ${client.user.tag}`);
+    } catch (error) {
+      console.error("Could not register Discord commands:", error);
+    }
   });
 
   client.on("interactionCreate", async (interaction) => {
@@ -106,10 +101,11 @@ export async function startDiscordBot() {
         await interaction.reply({
           content: [
             "**Job-Bot commands**",
-            "`/set-resume` — upload your resume",
-            "`/add-source` — add an approved public career page",
+            "`/set-resume` — upload your PDF or DOCX resume",
+            "`/add-source` — add an employer career page that permits automated access",
             "`/sources` — list configured sources",
-            "`/search` — run a search and send matching jobs here"
+            "`/search` — search configured sources and post new matches",
+            "`/mark-applied` — track a job you applied to"
           ].join("\n"),
           ephemeral: true
         });
@@ -120,7 +116,7 @@ export async function startDiscordBot() {
         await interaction.deferReply({ ephemeral: true });
         const attachment = interaction.options.getAttachment("file");
         const destination = await saveResume(attachment);
-        await interaction.editReply(`Resume saved to ${destination}.`);
+        await interaction.editReply(`Resume saved successfully (${destination}).`);
         return;
       }
 
@@ -145,6 +141,16 @@ export async function startDiscordBot() {
           : "No sources have been added yet.";
 
         await interaction.reply({ content: message, ephemeral: true });
+        return;
+      }
+
+      if (interaction.commandName === "mark-applied") {
+        const url = interaction.options.getString("url");
+        const job = await markJobApplied(url);
+        await interaction.reply({
+          content: `Marked **${job.title || "Job"}** at **${job.company || "the company"}** as applied.`,
+          ephemeral: true
+        });
         return;
       }
 
