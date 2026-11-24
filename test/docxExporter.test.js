@@ -25,14 +25,12 @@ test("builds a structured CV and places job-relevant skills near the top", () =>
   assert.equal(model.name, "Bucksmon");
   assert.deepEqual(model.sections.map((section) => section.title), [
     "Professional Summary",
-    "Additional Profile Details",
-    "Key Skills",
     "Skills & Tools",
     "Professional Experience",
     "Education"
   ]);
-  assert.ok(model.sections[2].skills.includes("JavaScript"));
-  assert.ok(model.sections[2].skills.includes("MongoDB"));
+  assert.ok(model.sections[1].lines.some((line) => line.includes("JavaScript")));
+  assert.ok(!model.sections.some((section) => section.title === "Additional Profile Details"));
 });
 
 test("exports an editable CV document", async () => {
