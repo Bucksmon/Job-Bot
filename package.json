@@ -1,26 +1,25 @@
 {
-  "name": "job-filter",
+  "name": "ats-resume-matcher",
   "version": "1.0.0",
   "private": true,
-  "description": "A hosted resume-based job discovery assistant with Discord notifications.",
-  "main": "src/index.js",
   "type": "module",
+  "description": "A lightweight resume and job-description matcher with a GitHub Pages frontend and Render API.",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "profile": "node src/resume/cli.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
-    "discord.js": "^14.24.2",
-    "dotenv": "^16.4.7",
-    "mammoth": "^1.9.1",
-    "node-cron": "^4.6.0",
-    "pdf-parse": "^1.1.1",
-    "playwright": "1.65.0",
-    "robots-parser": "^3.0.1"
+    "cors": "^2.8.5",
+    "docx": "^9.5.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "mammoth": "^1.11.0",
+    "multer": "^2.0.2",
+    "pdf-parse": "^1.1.4"
   }
 }

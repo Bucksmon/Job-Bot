@@ -1,75 +1,75 @@
-# Job-Bot
+# Resume Match
 
-A private Discord job-hunting assistant. It reads your resume, checks configured public employer career pages, filters jobs against your skills and preferences, and posts new matches to Discord.
+A small resume and job-description matcher.
 
-The application runs as a Render background worker, so your computer does not need to stay on.
+Upload a PDF or DOCX resume, paste a job description, review the keyword alignment, and export a tailored DOCX draft.
 
-## Current features
+## Architecture
 
-- Upload a PDF or DOCX resume with `/set-resume`.
-- Add public employer career pages with `/add-source`.
-- Check a source's `robots.txt` rules and its crawl delay before browsing.
-- Extract job postings from visible links and Schema.org `JobPosting` data.
-- Score job title, resume skills, location and experience level.
-- Avoid duplicate notifications using persistent job history.
-- Search on demand with `/search` or automatically every six hours.
-- Track applications you submit yourself with `/mark-applied`.
+- **Frontend:** Plain HTML, CSS and JavaScript hosted on GitHub Pages.
+- **Backend:** Node.js and Express hosted on Render.
+- **Resume parsing:** `pdf-parse` and `mammoth`.
+- **Document export:** `docx`.
+- **Analysis:** Transparent keyword matching and resume evidence selection. No ML model or external AI API is required.
 
-## Job-source rules
+## What it does
 
-This project does not automate LinkedIn or Indeed pages, log into those services, bypass CAPTCHA/anti-bot checks, or submit applications on those sites. Their terms restrict automated scraping and automated applications.
+1. Extracts text from a PDF or DOCX resume.
+2. Finds recognised skills and terms in the job description.
+3. Shows keyword overlap, missing terms, and resume evidence.
+4. Creates a cautious professional-summary draft based only on the supplied resume.
+5. Exports an editable DOCX draft while preserving the extracted original resume text.
 
-Playwright is used only for public employer career pages that permit automated access. Before adding a source, confirm that its terms permit it. The crawler also checks `robots.txt`, respects crawl delays, stays on the original host, and stops when a site returns access-denied, rate-limit or human-verification responses.
+The match percentage is an indicative keyword-alignment estimate. It is not a score from a specific ATS vendor and cannot guarantee that an application will pass an ATS.
 
-A site's `robots.txt` file is not a substitute for its terms of use. The `/add-source` confirmation is an explicit operator check, not an automated legal review.
+The tool must never be used to add skills, qualifications, employers, achievements, or years of experience that are not true.
 
-## Discord commands
-
-- `/set-resume file:<PDF or DOCX>` — save your resume on the persistent disk.
-- `/add-source url:<HTTPS career page> terms-confirmed:true` — add a permitted source.
-- `/sources` — list configured sources.
-- `/search` — run a search immediately.
-- `/mark-applied url:<job URL>` — track an application you submitted.
-- `/help` — list commands.
-
-Only the Discord user configured as `ALLOWED_DISCORD_USER_ID` can control the bot. Matching job alerts are posted to `DISCORD_CHANNEL_ID`.
-
-## Local development
+## Run locally
 
 Requirements: Node.js 22 or newer.
 
 ```bash
 npm install
 cp .env.example .env
-```
-
-Fill in the Discord values in `.env`, then run:
-
-```bash
 npm start
 ```
 
-Run tests with:
+The API listens on port 10000 by default. For local frontend testing, use a static server to serve the `site` folder and configure `site/config.js` with:
+
+```js
+window.JOBBOT_API_BASE = "http://localhost:10000";
+```
+
+Run tests:
 
 ```bash
 npm test
 ```
 
-## Render deployment
+## Deploy the backend to Render
 
-The repository includes a Render Blueprint for a Docker-based background worker in Frankfurt with a 1 GB persistent disk.
+The root `render.yaml` defines a Node.js web service.
 
-1. In Render, create a Blueprint using this repository and `render.yaml`.
-2. Supply `DISCORD_BOT_TOKEN`, `DISCORD_CHANNEL_ID`, `DISCORD_GUILD_ID`, and `ALLOWED_DISCORD_USER_ID`.
-3. Deploy the worker.
-4. In Discord, run `/set-resume`, then add permitted employer career pages with `/add-source`.
+1. Create a Render Blueprint from this repository, or create a Web Service connected to this repository.
+2. Use the repository root as the service root.
+3. Build command: `npm install`
+4. Start command: `npm start`
+5. Health check path: `/api/health`
+6. Set `FRONTEND_ORIGINS` to your GitHub Pages origin.
 
-The configured worker plan is `0.5c-512mb` ($7/month) and the 1 GB disk is approximately $0.25/month at current Render list pricing. Increase the worker plan if headless Chromium runs out of memory.
+The free Render web-service plan can spin down after inactivity; the first request after a spin-down may take around a minute to wake the service. Upgrade the service plan to avoid this limitation.
 
-## Application assistance
+## Deploy the frontend to GitHub Pages
 
-Job alerts include the original posting link. This release tracks applications marked through `/mark-applied`; it does not automatically submit forms. Application automation is site-specific and must only be added for employers that explicitly permit it, with a review step before submission.
+1. Open **Settings → Pages** in the repository.
+2. Set the publishing source to **GitHub Actions**.
+3. Update `site/config.js` with the actual Render API URL.
+4. Push to `main`; `.github/workflows/pages.yml` publishes the `site` folder.
 
-## Matching settings
+For a private repository, GitHub Pages availability depends on the GitHub plan. If the Pages settings do not allow publishing, make the repository public or use a plan that supports Pages for private repositories.
 
-Edit `PREFERRED_JOB_TITLES`, `JOB_LOCATION`, `MIN_MATCH_SCORE`, and `MAX_REQUIRED_YEARS` in the environment to tune relevance filtering.
+## Privacy
+
+Resume files are uploaded to the Render API for parsing in memory. The app does not write uploaded resumes or extracted resume text to disk or a database. The generated DOCX is returned directly to the browser. Do not upload a resume unless you are comfortable sending it to the configured backend.
+
+The API has an 8 MB upload limit, CORS origin restrictions, and a per-IP request limit.

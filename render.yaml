@@ -1,42 +1,17 @@
 services:
-  - type: worker
-    name: job-bot
-    runtime: docker
-    plan: 0.5c-512mb
+  - type: web
+    name: job-bot-api
+    runtime: node
+    plan: free
     region: frankfurt
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
     autoDeployTrigger: commit
-    disk:
-      name: job-bot-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DISCORD_BOT_TOKEN
-        sync: false
-      - key: DISCORD_CHANNEL_ID
-        sync: false
-      - key: DISCORD_GUILD_ID
-        sync: false
-      - key: ALLOWED_DISCORD_USER_ID
-        sync: false
-      - key: RESUME_DIRECTORY
-        value: /var/data
-      - key: RESUME_PATH
-        value: /var/data/resume.pdf
-      - key: RESUME_METADATA_PATH
-        value: /var/data/resume-meta.json
-      - key: JOB_HISTORY_PATH
-        value: /var/data/sent-jobs.json
-      - key: JOB_SOURCES_PATH
-        value: /var/data/sources.json
-      - key: JOB_LOCATION
-        value: Dubai, United Arab Emirates
-      - key: MIN_MATCH_SCORE
-        value: "70"
-      - key: MAX_REQUIRED_YEARS
-        value: "3"
-      - key: AUTO_SEARCH_CRON
-        value: "0 */6 * * *"
+      - key: MAX_UPLOAD_MB
+        value: "8"
+      - key: FRONTEND_ORIGINS
+        value: https://bucksmon.github.io
