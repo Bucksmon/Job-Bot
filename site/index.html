@@ -85,7 +85,7 @@
         </div>
         <div class="side-feature">
           <span class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h7M9 17h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
-          <div><h3>Tailored draft</h3><p>Download a searchable PDF tailored with verified skills and relevant resume evidence.</p></div>
+          <div><h3>Tailored draft</h3><p>Download a searchable PDF with a clear reading order and job-relevant content supported by your resume.</p></div>
         </div>
         <div class="side-divider"></div>
         <div class="side-tip">
@@ -119,6 +119,15 @@
         </div>
       </div>
 
+      <article class="result-card audit-card">
+        <div class="card-heading">
+          <h3>Resume readability checks</h3>
+          <span class="subtle-label">DOCUMENT QUALITY</span>
+        </div>
+        <p class="card-description">Checks whether your resume is extractable and clearly structured. These are practical parsing checks, not a score from an employer's ATS.</p>
+        <ul class="audit-list" id="audit-list"></ul>
+      </article>
+
       <div class="result-grid">
         <article class="result-card">
           <div class="card-heading"><h3>Keywords found</h3><span class="count-badge positive" id="matched-count">0</span></div>
@@ -145,7 +154,7 @@
         </div>
         <textarea id="summary-draft" rows="4" aria-label="Editable professional summary draft"></textarea>
         <div class="draft-footer">
-          <p>Review and edit this wording before using it. It is based on the resume you supplied.</p>
+          <p>Edit this wording before using it. If the source has no evidence for a summary, this field will stay blank rather than showing generic filler.</p>
           <button class="download-button" id="download-button" type="button">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Download tailored PDF
