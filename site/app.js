@@ -176,6 +176,163 @@ function renderResults(payload) {
   resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+const jobQueryInput = document.querySelector("#job-query");
+const jobLocationInput = document.querySelector("#job-location");
+const searchJobsButton = document.querySelector("#search-jobs");
+const jobResults = document.querySelector("#job-results");
+const jobList = document.querySelector("#job-list");
+
+function formatPublishedDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return "Published " + new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(date);
+}
+
+function renderJobs(payload) {
+  jobList.replaceChildren();
+  const count = Number(payload.total || 0);
+  document.querySelector("#job-results-count").textContent =
+    count + (count === 1 ? " vacancy found" : " vacancies found");
+
+  const workingSources = (payload.providers || []).filter((item) =>
+    item.status === "ok" || item.status === "cached"
+  ).length;
+  document.querySelector("#job-results-source").textContent =
+    workingSources + " employer boards checked";
+
+  if (!count) {
+    const empty = document.createElement("p");
+    empty.className = "job-empty";
+    empty.textContent = "No matching published roles were found in the selected employer boards. Try a broader title or location.";
+    jobList.append(empty);
+    jobResults.hidden = false;
+    return;
+  }
+
+  for (const job of payload.jobs) {
+    const card = document.createElement("article");
+    card.className = "job-card";
+
+    const top = document.createElement("div");
+    top.className = "job-card-top";
+
+    const identity = document.createElement("div");
+    const company = document.createElement("span");
+    company.className = "job-company";
+    company.textContent = job.company;
+
+    const title = document.createElement("h3");
+    title.textContent = job.title;
+    identity.append(company, title);
+
+    const type = document.createElement("span");
+    type.className = "job-type";
+    type.textContent = job.workplaceType || "Workplace not specified";
+    top.append(identity, type);
+
+    const meta = document.createElement("div");
+    meta.className = "job-meta";
+    [job.location, job.employmentType, formatPublishedDate(job.publishedAt), job.compensation]
+      .filter(Boolean)
+      .forEach((value) => {
+        const item = document.createElement("span");
+        item.textContent = value;
+        meta.append(item);
+      });
+
+    const description = document.createElement("p");
+    description.className = "job-description-preview";
+    description.textContent = (job.description || "The employer has not provided a plain-text job description.")
+      .slice(0, 420);
+
+    const actions = document.createElement("div");
+    actions.className = "job-card-actions";
+
+    const loadButton = document.createElement("button");
+    loadButton.type = "button";
+    loadButton.className = "job-use-button";
+    loadButton.textContent = "Use this job";
+    loadButton.addEventListener("click", () => {
+      jobTitleInput.value = job.title;
+      jobDescriptionInput.value = job.description || "";
+      jobDescriptionInput.dispatchEvent(new Event("input", { bubbles: true }));
+      document.querySelector("#job-description").scrollIntoView({ behavior: "smooth", block: "center" });
+      jobDescriptionInput.focus({ preventScroll: true });
+      showToast("Employer job description loaded. Upload your resume and analyse it.");
+    });
+
+    actions.append(loadButton);
+
+    for (const [label, url] of [
+      ["View posting", job.jobUrl],
+      ["Apply on employer site", job.applyUrl]
+    ]) {
+      if (!url) continue;
+      const link = document.createElement("a");
+      link.className = "job-link";
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = label;
+      actions.append(link);
+    }
+
+    card.append(top, meta, description, actions);
+    jobList.append(card);
+  }
+
+  jobResults.hidden = false;
+}
+
+searchJobsButton.addEventListener("click", async () => {
+  if (!apiBase) {
+    showToast("The job search service has not been configured.");
+    return;
+  }
+
+  const query = jobQueryInput.value.trim();
+  const location = jobLocationInput.value.trim();
+  searchJobsButton.disabled = true;
+  searchJobsButton.querySelector("span").textContent = "Searching…";
+  jobResults.hidden = false;
+  jobList.replaceChildren();
+
+  const loading = document.createElement("p");
+  loading.className = "job-empty";
+  loading.textContent = "Checking live employer career boards…";
+  jobList.append(loading);
+
+  try {
+    const params = new URLSearchParams({ q: query, location });
+    const response = await fetch(apiBase + "/api/jobs?" + params.toString());
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "Could not retrieve employer listings.");
+    renderJobs(payload);
+    showToast("Employer job search complete.");
+  } catch (error) {
+    jobList.replaceChildren();
+    const message = document.createElement("p");
+    message.className = "job-empty";
+    message.textContent = error.message || "Could not connect to the job search service.";
+    jobList.append(message);
+    showToast(error.message || "Job search failed.");
+  } finally {
+    searchJobsButton.disabled = false;
+    searchJobsButton.querySelector("span").textContent = "Find jobs";
+  }
+});
+
+for (const input of [jobQueryInput, jobLocationInput]) {
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") searchJobsButton.click();
+  });
+}
+
 analyzeButton.addEventListener("click", async () => {
   if (!apiBase) {
     showToast("The backend URL has not been configured yet.");
