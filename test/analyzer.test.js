@@ -66,3 +66,25 @@ test("summary draft only uses skills found in the supplied resume", () => {
   assert.match(result.summaryDraft, /JavaScript/);
   assert.doesNotMatch(result.summaryDraft, /Docker/);
 });
+
+test("recognises common resume wording and technology aliases", () => {
+  const keywords = extractKeywords("Built a ReactJS and Node app. Used JS, PostgreSQL, AWS and version control.");
+  assert.ok(keywords.includes("React"));
+  assert.ok(keywords.includes("Node.js"));
+  assert.ok(keywords.includes("JavaScript"));
+  assert.ok(keywords.includes("PostgreSQL"));
+  assert.ok(keywords.includes("AWS"));
+  assert.ok(keywords.includes("Git"));
+});
+
+test("recognises soft-skill synonyms without requiring exact phrasing", () => {
+  const result = analyzeResume({
+    resumeText: "Strong written and verbal communication. Worked with cross-functional teams. Applied analytical skills to resolve issues.",
+    jobDescription: "We need communication skills, collaboration, and problem solving in a fast-paced environment.",
+    jobTitle: "Operations Associate"
+  });
+  assert.ok(result.matchedKeywords.includes("Communication"));
+  assert.ok(result.matchedKeywords.includes("Collaboration"));
+  assert.ok(result.matchedKeywords.includes("Problem Solving"));
+  assert.ok(result.score > 0);
+});
