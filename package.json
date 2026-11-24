@@ -2,7 +2,7 @@
   "name": "job-filter",
   "version": "1.0.0",
   "private": true,
-  "description": "A local resume-based job discovery and Discord notification tool.",
+  "description": "A hosted resume-based job discovery assistant with Discord notifications.",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -12,12 +12,15 @@
     "test": "node --test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "discord.js": "^14.24.2",
     "dotenv": "^16.4.7",
     "mammoth": "^1.9.1",
-    "pdf-parse": "^1.1.1"
+    "node-cron": "^4.6.0",
+    "pdf-parse": "^1.1.1",
+    "playwright": "1.65.0",
+    "robots-parser": "^3.0.1"
   }
 }
