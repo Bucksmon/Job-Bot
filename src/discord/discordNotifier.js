@@ -9,11 +9,15 @@ function createJobEmbed(job) {
       { name: "Location", value: job.location || "Not provided", inline: true },
       { name: "Match", value: `${job.matchScore ?? 0}%`, inline: true }
     )
-    .setFooter({ text: "Job Filter · Resume match" });
+    .setFooter({ text: "Job-Bot · Resume match" });
 
-  // Discord only accepts a valid URL for the embed link.
   if (job.url && /^https?:\/\//i.test(job.url)) {
     embed.setURL(job.url);
+    embed.addFields({
+      name: "Application",
+      value: `[Open the original job posting](<${job.url}>)`,
+      inline: false
+    });
   }
 
   if (Array.isArray(job.matchedSkills) && job.matchedSkills.length > 0) {
@@ -32,6 +36,8 @@ function createJobEmbed(job) {
 }
 
 export async function sendJobsToDiscord(jobs, options = {}) {
+  if (jobs.length === 0) return;
+
   const token = options.token || process.env.DISCORD_BOT_TOKEN;
   const channelId = options.channelId || process.env.DISCORD_CHANNEL_ID;
 
@@ -40,13 +46,6 @@ export async function sendJobsToDiscord(jobs, options = {}) {
   }
 
   const rest = new REST({ version: "10" }).setToken(token);
-
-  if (jobs.length === 0) {
-    await rest.post(Routes.channelMessages(channelId), {
-      body: { content: "Search completed. No new matching jobs were found." }
-    });
-    return;
-  }
 
   // Discord accepts up to 10 embeds in one message.
   for (let index = 0; index < jobs.length; index += 10) {
