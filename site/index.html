@@ -29,6 +29,41 @@
       <p class="hero-copy">Compare your resume with a job description, identify relevant evidence, and export a tailored, searchable PDF.</p>
     </section>
 
+    <section class="job-finder" aria-label="Find live employer jobs">
+      <div class="job-finder-header">
+        <div>
+          <span class="step-label">OPTIONAL · LIVE EMPLOYER LISTINGS</span>
+          <h2>Find a role worth applying for.</h2>
+          <p>Search published vacancies from selected company career pages, then compare your resume against the actual job description.</p>
+        </div>
+        <span class="job-live-indicator"><span class="status-dot"></span> Employer sources</span>
+      </div>
+
+      <div class="job-search-form">
+        <div class="job-search-field">
+          <label for="job-query">Role or keywords</label>
+          <input id="job-query" type="text" value="Backend Software Engineer" maxlength="100" placeholder="e.g. Backend Software Engineer">
+        </div>
+        <div class="job-search-field">
+          <label for="job-location">Location</label>
+          <input id="job-location" type="text" value="Dubai, UAE" maxlength="100" placeholder="e.g. Dubai, UAE">
+        </div>
+        <button class="primary-button job-search-button" id="search-jobs" type="button">
+          <span>Find jobs</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="job-results" id="job-results" hidden>
+        <div class="job-results-heading">
+          <strong id="job-results-count">0 vacancies</strong>
+          <span id="job-results-source"></span>
+        </div>
+        <div class="job-list" id="job-list"></div>
+      </div>
+      <p class="job-source-note">Listings are fetched from public employer career boards. Availability can change; always confirm details on the employer’s own site. This is a curated source list, not every job on the internet.</p>
+    </section>
+
     <section class="workspace" aria-label="Resume analysis form">
       <div class="form-panel">
         <div class="section-heading">
