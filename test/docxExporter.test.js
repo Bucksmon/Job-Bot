@@ -17,3 +17,16 @@ test("exports an editable DOCX draft", async () => {
   assert.equal(buffer.subarray(0, 2).toString("ascii"), "PK");
   assert.ok(buffer.length > 1000);
 });
+
+test("exports even when optional notes are omitted", async () => {
+  const buffer = await createTailoredResumeDocx({
+    targetRole: "Software Developer",
+    summaryDraft: "Software developer experienced in JavaScript.",
+    matchedKeywords: ["JavaScript"],
+    missingKeywords: [],
+    evidence: [],
+    resumeText: "Software Developer with JavaScript experience."
+  });
+  assert.ok(Buffer.isBuffer(buffer));
+  assert.equal(buffer.subarray(0, 2).toString("ascii"), "PK");
+});
