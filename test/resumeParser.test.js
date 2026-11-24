@@ -24,7 +24,7 @@ test("extracts DOCX text with paragraph boundaries", async () => {
       children: [
         new Paragraph({ text: "Furqan Nadir" }),
         new Paragraph({ text: "Software Engineer" }),
-        new Paragraph({ text: "JavaScript, Node.js, PostgreSQL" })
+        new Paragraph({ text: "JavaScript, Node.js, PostgreSQL, Express.js and MongoDB. Built backend services, integrated REST APIs, and supported database queries for production web applications." })
       ]
     }]
   });
