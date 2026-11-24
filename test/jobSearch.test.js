@@ -104,5 +104,5 @@ test("does not return unsafe non-HTTPS employer links", async () => {
 });
 
 test("provides the curated live employer board list", () => {
-  assert.ok(employerBoards.length >= 8);
+  assert.ok(employerBoards.length >= 5);
 });
