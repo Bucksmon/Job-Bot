@@ -211,13 +211,13 @@ document.querySelector("#copy-summary").addEventListener("click", async () => {
 });
 
 downloadButton.addEventListener("click", async () => {
-  if (!apiBase || !currentDocumentData) {
-    showToast("Run an analysis before downloading a draft.");
+  if (!apiBase || !currentDocumentData || !selectedFile) {
+    showToast("Run an analysis and keep the original resume selected before downloading.");
     return;
   }
 
   downloadButton.disabled = true;
-  downloadButton.textContent = "Preparing DOCX…";
+  downloadButton.textContent = "Preparing tailored PDF…";
 
   try {
     const documentData = {
@@ -225,32 +225,35 @@ downloadButton.addEventListener("click", async () => {
       summaryDraft: summaryDraft.value.trim()
     };
 
-    const response = await fetch(`${apiBase}/api/export`, {
+    const formData = new FormData();
+    formData.append("resume", selectedFile);
+    formData.append("documentData", JSON.stringify(documentData));
+
+    const response = await fetch(apiBase + "/api/export/pdf", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ documentData })
+      body: formData
     });
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.error || "Could not create the DOCX file.");
+      throw new Error(payload.error || "Could not create the tailored PDF.");
     }
 
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `Tailored-Resume-${(documentData.targetRole || "Draft").replace(/[^a-z0-9]+/gi, "-")}.docx`;
+    anchor.download = "Tailored-Resume-" + (documentData.targetRole || "CV").replace(/[^a-z0-9]+/gi, "-") + ".pdf";
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1500);
-    showToast("Your tailored resume draft is ready.");
+    showToast("Your tailored, searchable PDF is ready.");
   } catch (error) {
-    showToast(error.message || "Could not download the DOCX.");
+    showToast(error.message || "Could not download the PDF.");
   } finally {
     downloadButton.disabled = false;
-    downloadButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Download tailored DOCX';
+    downloadButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Download tailored PDF';
   }
 });
 
