@@ -17,10 +17,11 @@ export async function filterAndNotify(jobs, profile, options = {}) {
   const relevantJobs = scoredJobs.filter((job) => job.isRelevant);
   const newJobs = await filterUnsentJobs(
     relevantJobs,
-    options.historyPath || "./data/sent-jobs.json"
+    options.historyPath || process.env.JOB_HISTORY_PATH || "./data/sent-jobs.json"
   );
 
-  if (options.notify !== false) {
+  // Keep Discord quiet when a search finds nothing new.
+  if (newJobs.length > 0 && options.notify !== false) {
     await (options.sendToDiscord || sendJobsToDiscord)(newJobs, options.discord);
   }
 
@@ -28,7 +29,7 @@ export async function filterAndNotify(jobs, profile, options = {}) {
   if (newJobs.length > 0 && options.markSent !== false) {
     await markJobsAsSent(
       newJobs,
-      options.historyPath || "./data/sent-jobs.json"
+      options.historyPath || process.env.JOB_HISTORY_PATH || "./data/sent-jobs.json"
     );
   }
 
