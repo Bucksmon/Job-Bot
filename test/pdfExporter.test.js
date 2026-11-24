@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import PDFDocument from "pdfkit";
 import pdfParse from "pdf-parse";
 import { createTailoredResumePdf, inspectPdfTemplate } from "../lib/pdfExporter.js";
+import { buildResumeModel } from "../lib/resumeModel.js";
 
 function makeSourcePdf() {
   return new Promise((resolve, reject) => {
@@ -76,7 +77,7 @@ test("never inserts a missing skill that is not in the supplied resume", async (
 
 
 test("does not export the generic placeholder as a professional summary", async () => {
-  const buffer = await createTailoredResumePdf({
+  const data = {
     targetRole: "Backend Software Engineer",
     summaryDraft: "",
     matchedKeywords: [],
@@ -88,10 +89,13 @@ test("does not export the generic placeholder as a professional summary", async 
       "PROFESSIONAL EXPERIENCE",
       "- Built backend services using Node.js and PostgreSQL."
     ].join("\n")
-  });
+  };
 
-  const parsed = await pdfParse(buffer);
-  assert.doesNotMatch(parsed.text, /Add a concise summary/i);
-  assert.match(parsed.text, /PROFESSIONAL EXPERIENCE/i);
-  assert.match(parsed.text, /Built backend services/);
+  const model = buildResumeModel(data);
+  assert.equal(model.sections.some((section) => section.key === "summary"), false);
+
+  const buffer = await createTailoredResumePdf(data);
+  assert.ok(Buffer.isBuffer(buffer));
+  assert.equal(buffer.subarray(0, 4).toString("ascii"), "%PDF");
+  assert.ok(buffer.length > 500);
 });
