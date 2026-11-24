@@ -112,7 +112,11 @@ function renderResults(payload) {
   document.querySelector("#score-description").textContent =
     analysis.score === null
       ? "The scanner did not find enough recognised role-specific terms to calculate a useful estimate."
-      : `Found ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job-description keywords in your resume.`;
+      : analysis.score === 0
+        ? analysis.resumeKeywordCount === 0
+          ? "We extracted resume text but could not recognise any skills from our current keyword library. Check that your resume text is selectable and review the skills list manually."
+          : `We recognised ${analysis.resumeKeywordCount} resume terms and ${analysis.jobKeywordCount} job-description terms, but found no exact keyword overlap. Related wording may still describe the same skill.`
+        : `Found ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job-description keywords in your resume.`;
 
   document.querySelector("#matched-count").textContent = analysis.matchedKeywords.length;
   document.querySelector("#missing-count").textContent = analysis.missingKeywords.length;
@@ -235,7 +239,7 @@ downloadButton.addEventListener("click", async () => {
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
     showToast("Your tailored resume draft is ready.");
   } catch (error) {
     showToast(error.message || "Could not download the DOCX.");
