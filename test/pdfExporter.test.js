@@ -73,3 +73,25 @@ test("never inserts a missing skill that is not in the supplied resume", async (
 
   assert.doesNotMatch(parsed.text, /Docker/);
 });
+
+
+test("does not export the generic placeholder as a professional summary", async () => {
+  const buffer = await createTailoredResumePdf({
+    targetRole: "Backend Software Engineer",
+    summaryDraft: "",
+    matchedKeywords: [],
+    resumeKeywords: [],
+    resumeText: [
+      "Furqan Nadir",
+      "PROFESSIONAL SUMMARY",
+      "Candidate targeting Backend Software Engineer. Add a concise summary of relevant experience and verified strengths from your resume before applying.",
+      "PROFESSIONAL EXPERIENCE",
+      "- Built backend services using Node.js and PostgreSQL."
+    ].join("\n")
+  });
+
+  const parsed = await pdfParse(buffer);
+  assert.doesNotMatch(parsed.text, /Add a concise summary/i);
+  assert.match(parsed.text, /PROFESSIONAL EXPERIENCE/i);
+  assert.match(parsed.text, /Built backend services/);
+});
