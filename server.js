@@ -47,8 +47,8 @@ const upload = multer({
     files: 1
   },
   fileFilter(_request, file, callback) {
-    const extensionAllowed = /\.(pdf|docx)$/i.test(file.originalname || "");
-    callback(extensionAllowed ? null : new Error("Only PDF and DOCX resumes are supported."), extensionAllowed);
+    const extensionAllowed = /\.(pdf|docx|doc)$/i.test(file.originalname || "");
+    callback(extensionAllowed ? null : new Error("Only PDF, DOCX, and DOC resumes are supported."), extensionAllowed);
   }
 });
 
@@ -117,6 +117,7 @@ app.post("/api/export", apiLimiter, async (request, response, next) => {
       evidence: Array.isArray(data.evidence)
         ? data.evidence.slice(0, 10).map(String)
         : [],
+      resumeKeywords: Array.isArray(data.resumeKeywords) ? data.resumeKeywords.slice(0, 80).map(String) : [],
       missingKeywords: Array.isArray(data.missingKeywords)
         ? data.missingKeywords.slice(0, 60).map(String)
         : [],

@@ -14,6 +14,8 @@ const toast = document.querySelector("#toast");
 const summaryDraft = document.querySelector("#summary-draft");
 const downloadButton = document.querySelector("#download-button");
 
+fileInput.accept = ".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
 let selectedFile = null;
 let currentDocumentData = null;
 let toastTimer;
@@ -28,9 +30,12 @@ function showToast(message) {
 function setSelectedFile(file) {
   if (!file) return;
 
-  const validExtension = /\.(pdf|docx)$/i.test(file.name);
+  const validExtension = /\.(pdf|docx|doc)$/i.test(file.name);
   if (!validExtension) {
-    showToast("Please choose a PDF or DOCX resume.");
+    selectedFile = null;
+    filePill.hidden = true;
+    fileInput.value = "";
+    showToast("Please choose a PDF, DOCX, or DOC resume.");
     return;
   }
 

@@ -2,23 +2,23 @@
 
 A small resume and job-description matcher.
 
-Upload a PDF or DOCX resume, paste a job description, review the keyword alignment, and export a tailored DOCX draft.
+Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the keyword alignment, and export a tailored DOCX draft.
 
 ## Architecture
 
 - **Frontend:** Plain HTML, CSS and JavaScript hosted on GitHub Pages.
 - **Backend:** Node.js and Express hosted on Render.
-- **Resume parsing:** `pdf-parse` and `mammoth`.
+- **Resume parsing:** `pdf-parse`, `mammoth`, and `word-extractor`.
 - **Document export:** `docx`.
 - **Analysis:** Transparent keyword matching and resume evidence selection. No ML model or external AI API is required.
 
 ## What it does
 
-1. Extracts text from a PDF or DOCX resume.
+1. Extracts text from PDF, modern Word DOCX, and legacy Word DOC resumes.
 2. Finds recognised skills and terms in the job description.
 3. Shows keyword overlap, missing terms, and resume evidence.
 4. Creates an editable professional-summary draft based only on the supplied resume.
-5. Exports a DOCX draft with relevant keywords, existing evidence, and original resume content.
+5. Exports a structured, editable CV with a professional summary, key skills, and the original experience, project, education, and certification sections that could be identified.
 
 The match percentage is an indicative keyword-alignment estimate. It is not a score from a specific ATS vendor and cannot guarantee that an application will pass an ATS.
 
