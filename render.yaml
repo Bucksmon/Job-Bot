@@ -1,0 +1,38 @@
+services:
+  - type: worker
+    name: job-bot
+    runtime: docker
+    plan: 0.5c-512mb
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    disk:
+      name: job-bot-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: DISCORD_CHANNEL_ID
+        sync: false
+      - key: DISCORD_GUILD_ID
+        sync: false
+      - key: ALLOWED_DISCORD_USER_ID
+        sync: false
+      - key: RESUME_PATH
+        value: /var/data/resume.pdf
+      - key: JOB_HISTORY_PATH
+        value: /var/data/sent-jobs.json
+      - key: JOB_SOURCES_PATH
+        value: /var/data/sources.json
+      - key: JOB_LOCATION
+        value: Dubai, United Arab Emirates
+      - key: MIN_MATCH_SCORE
+        value: "70"
+      - key: MAX_REQUIRED_YEARS
+        value: "3"
+      - key: AUTO_SEARCH_CRON
+        value: "0 */6 * * *"
