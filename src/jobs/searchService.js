@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { preferences } from "../config/preferences.js";
 import { extractResumeText } from "../resume/resumeParser.js";
+import { getResumePath } from "../resume/resumeStorage.js";
 import { extractProfile } from "../resume/profileExtractor.js";
 import { listSources } from "../discovery/sourceStore.js";
 import { crawlCareerSource } from "../discovery/publicCareerCrawler.js";
@@ -16,13 +17,16 @@ export async function runSearch() {
   searchInProgress = true;
 
   try {
-    const resumePath = process.env.RESUME_PATH || "./data/resume.pdf";
-    const resumeText = await extractResumeText(resumePath);
+    const resumeText = await extractResumeText(await getResumePath());
     const profile = extractProfile(resumeText, preferences);
     const sources = await listSources();
 
+    if (profile.skills.length === 0) {
+      throw new Error("No supported technical skills were found in the resume. Check the resume text and skill dictionary.");
+    }
+
     if (sources.length === 0) {
-      throw new Error("No job sources configured. Use /add-source with a public employer career page that permits automated access.");
+      throw new Error("No career sources configured. Use /add-source with an employer career page that permits automated access.");
     }
 
     const collectedJobs = [];
