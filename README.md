@@ -77,3 +77,17 @@ GitHub Pages is available for public repositories on GitHub Free. A private repo
 Resume files are uploaded to the Render API for parsing in memory. The app does not write uploaded resumes or extracted resume text to disk or a database. The generated PDF is returned directly to the browser. Do not upload a resume unless you are comfortable sending it to the configured backend.
 
 The API has an 8 MB upload limit, CORS origin restrictions, and a per-IP request limit.
+
+## Employer job search
+
+The website includes a simple live job search that queries a curated list of public Ashby employer career boards from the Node.js backend. The current board list is maintained in `lib/jobSearch.js`; the browser never chooses arbitrary upstream URLs. The API filters to published/listed vacancies, searches title and description terms, checks location, caches feed responses for 10 minutes, and returns the employer's posting and application links.
+
+- Endpoint: `GET /api/jobs?q=Backend%20Software%20Engineer&location=Dubai%2C%20UAE`
+- Current board coverage is curated, not exhaustive. An empty result means no match was found in the boards currently configured; it does not prove there are no vacancies elsewhere.
+- Listings are fetched directly from public employer boards using Ashby's documented public Job Postings API. Availability, role status and application requirements must be confirmed on the employer's own posting.
+
+## Resume parsing and ATS checks
+
+PDF text is reconstructed from its text-run coordinates so words in separate visual runs (for example a job title and right-aligned date) are separated correctly. The analysis response also returns document-readability checks for extracted text, contact details, standard sections, dates, layout and achievement bullets. These are practical diagnostics, not a score from any employer's ATS.
+
+Tailored PDF exports preserve the source PDF's page dimensions and typography scale where inspectable, but rebuild content into a searchable text layout. Complex source columns may be linearised. A 100% ATS score cannot be guaranteed across different applicant tracking systems; only information supported by the resume is promoted into the tailored version.
