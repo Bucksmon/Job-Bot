@@ -7,12 +7,11 @@ function normalize(value = "") {
 
 function titleMatches(jobTitle, preferredTitles) {
   const title = normalize(jobTitle);
-
   if (!title) return false;
 
   return preferredTitles.some((preferredTitle) => {
     const target = normalize(preferredTitle);
-    return target && (title.includes(target) || target.includes(title));
+    return target && title.includes(target);
   });
 }
 
@@ -31,8 +30,6 @@ function locationMatches(jobLocation, preferredLocation) {
 
   if (!job || !preferred) return false;
   if (job.includes("remote") || job.includes("worldwide")) return true;
-
-  // Dubai searches should also accept UAE-wide opportunities.
   if (preferred.includes("dubai") && job.includes("uae")) return true;
 
   return job.includes(preferred) || preferred.includes(job);
@@ -46,7 +43,6 @@ export function scoreJob(job, profile) {
     jobText.includes(normalize(skill))
   );
 
-  // Cap the skill denominator so a long resume does not unfairly lower scores.
   const skillTarget = Math.min(profile.skills.length, 5);
   const skillScore = skillTarget === 0
     ? 0
