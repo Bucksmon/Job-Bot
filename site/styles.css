@@ -444,3 +444,41 @@ h1 span { color: var(--blue); }
   .draft-footer p { max-width: none; }
   .footer { gap: 12px; align-items: center; font-size: 9px; }
 }
+
+
+.audit-card { margin-top: 15px; }
+.audit-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.audit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e6eaf0;
+  border-radius: 9px;
+  background: #fbfcfe;
+}
+.audit-status {
+  flex: 0 0 auto;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+.audit-item.pass .audit-status { color: #237451; background: #eaf6ef; }
+.audit-item.review .audit-status { color: #9a6a1e; background: #fff4df; }
+.audit-item.info .audit-status { color: #596b7b; background: #edf2f6; }
+.audit-item strong { display: block; margin: 1px 0 4px; font-size: 11px; }
+.audit-item p { margin: 0; color: #7d8792; font-size: 10px; line-height: 1.55; }
+
+@media (max-width: 560px) {
+  .audit-list { grid-template-columns: 1fr; }
+}
