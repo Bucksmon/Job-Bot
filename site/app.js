@@ -114,17 +114,20 @@ function renderResults(payload) {
     analysis.score >= 45 ? "Some relevant terms found" :
     "More alignment may be needed";
 
+  const detectedResumeSkills = analysis.resumeSkills || analysis.resumeKeywords || [];
   document.querySelector("#score-description").textContent =
     analysis.score === null
-      ? "No recognised role-specific terms were found in the job title or description. Add the technologies, responsibilities or qualifications listed by the employer."
+      ? `We extracted ${detectedResumeSkills.length} skills from your resume, but could not recognise any job-specific terms. Try including the job's technical requirements or responsibilities.`
       : analysis.score === 0
-        ? `No direct overlap was found. We identified ${analysis.resumeKeywordCount} skills in your CV and ${analysis.jobKeywordCount} recognised job-description terms. Review the evidence and gaps below; related wording may still describe the same capability.`
-        : `Matched ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job-description terms. We also identified ${analysis.resumeKeywordCount} skills and technologies in your CV.`;
+        ? `We found ${detectedResumeSkills.length} skills in your resume and ${analysis.jobKeywordCount} recognised job terms, but no direct overlap. Review the evidence and gaps below; related wording may still describe the same capability.`
+        : `Matched ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job terms. We also detected ${detectedResumeSkills.length} skills in your resume.`;
 
-  document.querySelector("#matched-count").textContent = analysis.resumeKeywordCount;
+  document.querySelector("#resume-skill-count").textContent = detectedResumeSkills.length;
+  document.querySelector("#matched-count").textContent = analysis.matchedKeywords.length;
   document.querySelector("#missing-count").textContent = analysis.missingKeywords.length;
 
-  addTags(document.querySelector("#matched-list"), analysis.resumeKeywords);
+  addTags(document.querySelector("#resume-skill-list"), detectedResumeSkills);
+  addTags(document.querySelector("#matched-list"), analysis.matchedKeywords);
   addTags(document.querySelector("#missing-list"), analysis.missingKeywords, true);
 
   const evidenceList = document.querySelector("#evidence-list");

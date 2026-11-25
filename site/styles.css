@@ -322,7 +322,7 @@ h1 span { color: var(--blue); }
 .score-copy p { margin: 0 0 7px; color: #727c89; font-size: 12px; line-height: 1.55; }
 .score-caveat { color: #9aa2ac; font-size: 10px; }
 
-.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+.result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-top: 15px; }
 .result-card {
   min-width: 0;
   padding: 22px;
@@ -415,6 +415,7 @@ h1 span { color: var(--blue); }
 [hidden] { display: none !important; }
 
 @media (max-width: 780px) {
+  .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .page-shell { padding-top: 48px; }
   .workspace { grid-template-columns: 1fr; }
   .side-panel { border-top: 1px solid var(--line); border-left: 0; padding: 26px 30px; }

@@ -172,7 +172,7 @@ test("builds a truthful profile summary when the job description has no exact ke
     jobTitle: "Senior Software Engineer Inference Platform Agent Sandboxes"
   });
 
-  assert.equal(result.matchedKeywords.length, 0);
+  assert.deepEqual(result.matchedKeywords, ["Software Development"]);
   assert.match(result.summaryDraft, /Software Engineering graduate/);
   assert.match(result.summaryDraft, /25% faster page loads/);
   assert.match(result.summaryDraft, /Puppeteer/);

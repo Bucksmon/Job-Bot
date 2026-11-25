@@ -166,13 +166,18 @@
 
       <div class="result-grid">
         <article class="result-card">
-          <div class="card-heading"><h3>Skills detected in your resume</h3><span class="count-badge positive" id="matched-count">0</span></div>
-          <p class="card-description">Recognised technologies and competencies extracted from your CV, independent of the job description.</p>
+          <div class="card-heading"><h3>Skills in your resume</h3><span class="count-badge positive" id="resume-skill-count">0</span></div>
+          <p class="card-description">Recognised technologies and competencies extracted from your CV, regardless of the job description.</p>
+          <div class="tag-list" id="resume-skill-list"></div>
+        </article>
+        <article class="result-card">
+          <div class="card-heading"><h3>Matched job terms</h3><span class="count-badge positive" id="matched-count">0</span></div>
+          <p class="card-description">Recognised terms that appear in both the job title or description and your resume.</p>
           <div class="tag-list" id="matched-list"></div>
         </article>
         <article class="result-card">
-          <div class="card-heading"><h3>Job-description gaps</h3><span class="count-badge caution" id="missing-count">0</span></div>
-          <p class="card-description">Recognised job requirements that were not located in your CV. These are suggestions to review, not proof that you lack the skill.</p>
+          <div class="card-heading"><h3>Gaps to review</h3><span class="count-badge caution" id="missing-count">0</span></div>
+          <p class="card-description">Recognised job terms not located in your CV. These are suggestions to review, not proof that you lack the skill.</p>
           <div class="tag-list" id="missing-list"></div>
         </article>
       </div>
