@@ -2,14 +2,14 @@
 
 A small resume and job-description matcher.
 
-Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the keyword alignment, and export a tailored, searchable PDF.
+Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the keyword alignment, and receive copy-ready CV edits to apply manually.
 
 ## Architecture
 
 - **Frontend:** Plain HTML, CSS and JavaScript hosted on GitHub Pages.
 - **Backend:** Node.js and Express hosted on Render.
 - **Resume parsing:** `pdfjs-dist`, `mammoth`, and `word-extractor`.
-- **PDF export:** `pdfkit` with `pdfjs-dist` template inspection.
+- **PDF export:** `pdfjs-dist` for PDF text extraction.
 - **Analysis:** Transparent keyword matching and resume evidence selection. No ML model or external AI API is required.
 
 ## What it does
@@ -20,7 +20,7 @@ Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the ke
 4. Creates an editable professional-summary draft based only on the supplied resume.
 5. Exports a text-based, searchable PDF with a professional summary, relevant skills already evidenced in the resume, and the original experience, project, education, and certification sections that could be identified.
 
-The match percentage is an indicative keyword-alignment estimate. ATS products use different parsing and ranking rules, so no third-party ATS score or 100% pass can be guaranteed. The export uses selectable text, standard section headings, and a single-column reading order. When the source is a PDF, its page dimensions and layout type are inspected; complex columns may be normalised for more reliable parsing.
+The match percentage is an indicative keyword-alignment estimate. ATS products use different parsing and ranking rules, so no third-party ATS score or 100% pass can be guaranteed. The suggested text is not a replacement CV or a generated file. It is intended to be reviewed and manually added to the original document.
 
 The tool must never be used to add skills, qualifications, employers, achievements, or years of experience that are not true.
 
@@ -74,7 +74,7 @@ GitHub Pages is available for public repositories on GitHub Free. A private repo
 
 ## Privacy
 
-Resume files are uploaded to the Render API for parsing in memory. The app does not write uploaded resumes or extracted resume text to disk or a database. The generated PDF is returned directly to the browser. Do not upload a resume unless you are comfortable sending it to the configured backend.
+Resume files are uploaded to the Render API for parsing in memory. The app does not write uploaded resumes or extracted resume text to disk or a database. The app returns analysis and suggested text directly to the browser; users update their own CV manually. Do not upload a resume unless you are comfortable sending it to the configured backend.
 
 The API has an 8 MB upload limit, CORS origin restrictions, and a per-IP request limit.
 
@@ -91,3 +91,4 @@ The website includes a simple live job search that queries a curated list of pub
 PDF text is reconstructed from its text-run coordinates so words in separate visual runs (for example a job title and right-aligned date) are separated correctly. The analysis response also returns document-readability checks for extracted text, contact details, standard sections, dates, layout and achievement bullets. These are practical diagnostics, not a score from any employer's ATS.
 
 Tailored PDF exports preserve the source PDF's page dimensions and typography scale where inspectable, but rebuild content into a searchable text layout. Complex source columns may be linearised. A 100% ATS score cannot be guaranteed across different applicant tracking systems; only information supported by the resume is promoted into the tailored version.
+\n## Applying suggested CV edits\n\nThe app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.\n

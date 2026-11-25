@@ -220,3 +220,33 @@ test("recognises the generic Software Engineer description and still returns sou
   assert.match(result.summaryDraft, /Software Engineering graduate/);
   assert.match(result.summaryDraft, /JavaScript/);
 });
+
+test("builds manual CV edits from the supplied resume and keeps unsupported job terms separate", () => {
+  const resume = [
+    "FURQAN NADIR",
+    "EXPERIENCE",
+    "Web Developer Intern",
+    "Marketist",
+    "- Optimized the mockup generator load time and UI responsiveness, resulting in 25% faster page loads.",
+    "- Built and deployed a Puppeteer-based screenshot service for automated website previews.",
+    "PROJECTS",
+    "GrabNGo",
+    "- Developed a self-checkout application using React Native, Node.js and MongoDB.",
+    "SKILLS & AWARDS",
+    "Technical Skills: JavaScript, React Native, Node.js, MongoDB, Puppeteer",
+    "Languages: English"
+  ].join("\n");
+
+  const result = analyzeResume({
+    resumeText: resume,
+    jobDescription: "Required: JavaScript, React Native, Node.js, MongoDB and Docker. Build and maintain software applications.",
+    jobTitle: "Junior Software Engineer"
+  });
+
+  assert.ok(result.suggestedEdits.skillsText.includes("JavaScript"));
+  assert.ok(result.suggestedEdits.skillsText.includes("Node.js"));
+  assert.ok(result.suggestedEdits.experienceBullets.some((line) => /25% faster page loads/.test(line)));
+  assert.ok(result.suggestedEdits.projectBullets.some((line) => /React Native, Node.js and MongoDB/.test(line)));
+  assert.ok(result.suggestedEdits.termsToVerify.includes("Docker"));
+  assert.doesNotMatch(result.suggestedEdits.skillsText, /Docker/);
+});

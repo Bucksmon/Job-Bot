@@ -4,8 +4,7 @@ import helmet from "helmet";
 import multer from "multer";
 import rateLimit from "express-rate-limit";
 import { extractResumeDocument, buildResumeAudit } from "./lib/resumeParser.js";
-import { analyzeResume, buildDocumentData } from "./lib/analyzer.js";
-import { createTailoredResumePdf } from "./lib/pdfExporter.js";
+import { analyzeResume } from "./lib/analyzer.js";
 import { searchEmployerJobs } from "./lib/jobSearch.js";
 
 const app = express();
@@ -96,66 +95,8 @@ app.post("/api/analyze", apiLimiter, upload.single("resume"), async (request, re
 
     return response.json({
       analysis,
-      resumeAudit: buildResumeAudit(resumeDocument),
-      documentData: buildDocumentData({ analysis, resumeText })
+      resumeAudit: buildResumeAudit(resumeDocument)
     });
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post("/api/export/pdf", apiLimiter, upload.single("resume"), async (request, response, next) => {
-  try {
-    if (!request.file) {
-      return response.status(400).json({ error: "Upload the original resume again to export its tailored PDF." });
-    }
-
-    let data;
-    try {
-      data = JSON.parse(String(request.body.documentData || "{}"));
-    } catch {
-      return response.status(400).json({ error: "The resume export data is invalid. Run the analysis again." });
-    }
-
-    if (!data || typeof data !== "object" || typeof data.resumeText !== "string") {
-      return response.status(400).json({ error: "Run an analysis before exporting a tailored PDF." });
-    }
-
-    if (data.resumeText.length > 60000) {
-      return response.status(400).json({ error: "The resume text is too large to export." });
-    }
-
-    const targetRole = String(data.targetRole || "Tailored CV")
-      .replace(/[\r\n\t]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 120) || "Tailored CV";
-    const safeTitle = targetRole
-      .replace(/[^a-z0-9-_ ]/gi, "")
-      .trim()
-      .slice(0, 60) || "Tailored-CV";
-
-    const originalPdf = /\.pdf$/i.test(request.file.originalname) ? request.file.buffer : null;
-    const buffer = await createTailoredResumePdf({
-      targetRole,
-      summaryDraft: String(data.summaryDraft || "").slice(0, 3000),
-      matchedKeywords: Array.isArray(data.matchedKeywords)
-        ? data.matchedKeywords.slice(0, 50).map(String)
-        : [],
-      resumeKeywords: Array.isArray(data.resumeKeywords)
-        ? data.resumeKeywords.slice(0, 80).map(String)
-        : [],
-      resumeText: data.resumeText
-    }, originalPdf);
-
-    response
-      .setHeader("Content-Type", "application/pdf")
-      .setHeader("Cache-Control", "no-store")
-      .setHeader(
-        "Content-Disposition",
-        'attachment; filename="Tailored-Resume-' + safeTitle.replace(/\s+/g, "-") + '.pdf"'
-      )
-      .send(buffer);
   } catch (error) {
     next(error);
   }

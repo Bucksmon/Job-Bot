@@ -12,12 +12,10 @@ const analyzeButton = document.querySelector("#analyze-button");
 const resultsSection = document.querySelector("#results");
 const toast = document.querySelector("#toast");
 const summaryDraft = document.querySelector("#summary-draft");
-const downloadButton = document.querySelector("#download-button");
 
 fileInput.accept = ".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 let selectedFile = null;
-let currentDocumentData = null;
 let toastTimer;
 
 function showToast(message) {
@@ -167,11 +165,18 @@ function renderResults(payload) {
     auditList.append(item);
   }
 
-  summaryDraft.value = analysis.summaryDraft || "";
-  summaryDraft.placeholder = analysis.summaryDraft
+  const suggestions = analysis.suggestedEdits || {};
+  summaryDraft.value = suggestions.summary || analysis.summaryDraft || "";
+  summaryDraft.placeholder = summaryDraft.value
     ? ""
-    : "Add a short summary using only skills, projects and experience that already appear in your resume.";
-  currentDocumentData = payload.documentData;
+    : "No evidence-backed summary could be assembled. Draft one manually using facts from your CV.";
+
+  document.querySelector("#skills-draft").value = suggestions.skillsText || "";
+  document.querySelector("#experience-draft").value =
+    (suggestions.experienceBullets || []).map((line) => "- " + line).join("\n");
+  document.querySelector("#projects-draft").value =
+    (suggestions.projectBullets || []).map((line) => "- " + line).join("\n");
+  addTags(document.querySelector("#verify-terms"), suggestions.termsToVerify || [], true);
   document.querySelector("#method-note").textContent = analysis.notes.join(" ");
   resultsSection.hidden = false;
   resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -380,68 +385,28 @@ analyzeButton.addEventListener("click", async () => {
   }
 });
 
-document.querySelector("#copy-summary").addEventListener("click", async () => {
-  if (!summaryDraft.value.trim()) return;
-
-  try {
-    await navigator.clipboard.writeText(summaryDraft.value);
-    showToast("Summary copied.");
-  } catch {
-    summaryDraft.select();
-    document.execCommand("copy");
-    showToast("Summary copied.");
-  }
-});
-
-downloadButton.addEventListener("click", async () => {
-  if (!apiBase || !currentDocumentData || !selectedFile) {
-    showToast("Run an analysis and keep the original resume selected before downloading.");
+async function copySuggestion(targetId) {
+  const field = document.getElementById(targetId);
+  if (!field?.value.trim()) {
+    showToast("There is no suggested text to copy for this section.");
     return;
   }
 
-  downloadButton.disabled = true;
-  downloadButton.textContent = "Preparing tailored PDF…";
-
   try {
-    const documentData = {
-      ...currentDocumentData,
-      summaryDraft: summaryDraft.value.trim()
-    };
-
-    const formData = new FormData();
-    formData.append("resume", selectedFile);
-    formData.append("documentData", JSON.stringify(documentData));
-
-    const response = await fetch(apiBase + "/api/export/pdf", {
-      method: "POST",
-      body: formData
-    });
-
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.error || "Could not create the tailored PDF.");
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "Tailored-Resume-" + (documentData.targetRole || "CV").replace(/[^a-z0-9]+/gi, "-") + ".pdf";
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
-    showToast("Your tailored, searchable PDF is ready.");
-  } catch (error) {
-    showToast(error.message || "Could not download the PDF.");
-  } finally {
-    downloadButton.disabled = false;
-    downloadButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Download tailored PDF';
+    await navigator.clipboard.writeText(field.value);
+    showToast("Suggested text copied.");
+  } catch {
+    field.select();
+    document.execCommand("copy");
+    showToast("Suggested text copied.");
   }
-});
+}
+
+for (const button of document.querySelectorAll(".copy-suggestion")) {
+  button.addEventListener("click", () => copySuggestion(button.dataset.copyTarget));
+}
 
 document.querySelector("#start-over").addEventListener("click", () => {
   resultsSection.hidden = true;
-  currentDocumentData = null;
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
