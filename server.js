@@ -125,14 +125,19 @@ app.post("/api/export/pdf", apiLimiter, upload.single("resume"), async (request,
       return response.status(400).json({ error: "The resume text is too large to export." });
     }
 
-    const safeTitle = String(data.targetRole || "Tailored CV")
+    const targetRole = String(data.targetRole || "Tailored CV")
+      .replace(/[\r\n\t]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 120) || "Tailored CV";
+    const safeTitle = targetRole
       .replace(/[^a-z0-9-_ ]/gi, "")
       .trim()
-      .slice(0, 50) || "Tailored CV";
+      .slice(0, 60) || "Tailored-CV";
 
     const originalPdf = /\.pdf$/i.test(request.file.originalname) ? request.file.buffer : null;
     const buffer = await createTailoredResumePdf({
-      targetRole: safeTitle,
+      targetRole,
       summaryDraft: String(data.summaryDraft || "").slice(0, 3000),
       matchedKeywords: Array.isArray(data.matchedKeywords)
         ? data.matchedKeywords.slice(0, 50).map(String)

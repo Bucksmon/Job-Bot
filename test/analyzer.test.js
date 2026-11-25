@@ -149,3 +149,32 @@ test("classifies skills under required and preferred headings", () => {
   assert.deepEqual(result.matchedRequired, ["JavaScript", "Node.js"]);
   assert.deepEqual(result.matchedPreferred, []);
 });
+
+test("builds a truthful profile summary when the job description has no exact keyword overlap", () => {
+  const resume = [
+    "FURQAN NADIR",
+    "EXPERIENCE",
+    "Web Developer Intern",
+    "Marketist",
+    "- Optimized the mockup generator's load time and UI responsiveness, serving 40-50 daily active users, resulting in 25% faster page loads.",
+    "- Built and deployed a Puppeteer-based screenshot and video generation service for automated website previews, while maintaining service availability during development and deployment.",
+    "EDUCATION",
+    "BSc Software Engineering",
+    "PROJECTS",
+    "- Created a full-stack marketplace for GTA World, supporting 60+ registered users to list and purchase items.",
+    "SKILLS & AWARDS",
+    "Technical Skills: C++, Python, JavaScript, React, Node.js, Express.js, MongoDB, REST APIs, Puppeteer"
+  ].join("\n");
+
+  const result = analyzeResume({
+    resumeText: resume,
+    jobDescription: "Build an inference platform and isolated agent sandboxes. Work on model-serving orchestration, runtime reliability, execution environments, and large-scale distributed systems.",
+    jobTitle: "Senior Software Engineer Inference Platform Agent Sandboxes"
+  });
+
+  assert.equal(result.matchedKeywords.length, 0);
+  assert.match(result.summaryDraft, /Software Engineering graduate/);
+  assert.match(result.summaryDraft, /25% faster page loads/);
+  assert.match(result.summaryDraft, /Puppeteer/);
+  assert.doesNotMatch(result.summaryDraft, /Kubernetes|distributed systems experience/i);
+});

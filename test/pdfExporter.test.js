@@ -61,6 +61,8 @@ test("exports an ATS-readable PDF using the source page dimensions", async () =>
   assert.match(parsed.text, /JavaScript/);
   assert.match(parsed.text, /PROFESSIONAL EXPERIENCE/i);
   assert.match(parsed.text, /EDUCATION/i);
+  assert.equal(parsed.numpages, 1, "The footer must remain on the generated page.");
+  assert.match(parsed.text, /Page 1 of 1/);
 });
 
 test("never inserts a missing skill that is not in the supplied resume", async () => {

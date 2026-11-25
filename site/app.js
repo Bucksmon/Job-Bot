@@ -169,7 +169,7 @@ function renderResults(payload) {
   summaryDraft.value = analysis.summaryDraft || "";
   summaryDraft.placeholder = analysis.summaryDraft
     ? ""
-    : "No evidence-based summary could be generated from the source resume. Add a truthful summary here, or keep your original summary in the CV.";
+    : "Add a short summary using only skills, projects and experience that already appear in your resume.";
   currentDocumentData = payload.documentData;
   document.querySelector("#method-note").textContent = analysis.notes.join(" ");
   resultsSection.hidden = false;
