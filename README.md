@@ -9,7 +9,7 @@ Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the ke
 - **Frontend:** Plain HTML, CSS and JavaScript hosted on GitHub Pages.
 - **Backend:** Node.js and Express hosted on Render.
 - **Resume parsing:** `pdfjs-dist`, `mammoth`, and `word-extractor`.
-- **PDF export:** `pdfjs-dist` for PDF text extraction.
+- **Tailoring suggestions:** copy-ready, evidence-based CV content for manual editing.
 - **Analysis:** Transparent keyword matching and resume evidence selection. No ML model or external AI API is required.
 
 ## What it does
@@ -17,10 +17,10 @@ Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the ke
 1. Extracts text from PDF, modern Word DOCX, and legacy Word DOC resumes.
 2. Finds recognised skills and terms in the job description.
 3. Shows keyword overlap, missing terms, and resume evidence.
-4. Creates an editable professional-summary draft based only on the supplied resume.
-5. Exports a text-based, searchable PDF with a professional summary, relevant skills already evidenced in the resume, and the original experience, project, education, and certification sections that could be identified.
+4. Creates copy-ready suggestions for the professional summary, skills, relevant experience bullets, and projects.
+5. Separately flags job-description terms that were not found in the resume. These must only be added when the candidate can genuinely support them.
 
-The match percentage is an indicative keyword-alignment estimate. ATS products use different parsing and ranking rules, so no third-party ATS score or 100% pass can be guaranteed. The suggested text is not a replacement CV or a generated file. It is intended to be reviewed and manually added to the original document.
+The match percentage is an indicative keyword-alignment estimate based on recognised terms, not a score from a specific ATS. ATS products use different parsing and ranking rules, so no third-party ATS score or 100% pass can be guaranteed. The app checks whether a source PDF has selectable text and a clear reading structure. Suggested text is grounded in the resume and intended to be reviewed and manually added to the original document.
 
 The tool must never be used to add skills, qualifications, employers, achievements, or years of experience that are not true.
 
@@ -89,4 +89,8 @@ The website includes a simple live job search that queries a curated list of pub
 ## Resume parsing and ATS checks
 
 PDF text is reconstructed from its text-run coordinates so words in separate visual runs (for example a job title and right-aligned date) are separated correctly. The analysis response also returns document-readability checks for extracted text, contact details, standard sections, dates, layout and achievement bullets. These are practical diagnostics, not a score from any employer's ATS.
-\n## Applying suggested CV edits\n\nThe app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.\n
+
+
+## Applying suggested CV edits
+
+The app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.\n

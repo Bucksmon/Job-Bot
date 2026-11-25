@@ -22,5 +22,8 @@
     "multer": "^2.0.2",
     "pdfjs-dist": "^6.5.438",
     "word-extractor": "^1.0.4"
+  },
+  "devDependencies": {
+    "pdfkit": "^0.21.0"
   }
 }
