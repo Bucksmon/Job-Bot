@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import PDFDocument from "pdfkit";
-import pdfParse from "pdf-parse";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { createTailoredResumePdf, inspectPdfTemplate } from "../lib/pdfExporter.js";
 import { buildResumeModel } from "../lib/resumeModel.js";
 
@@ -18,6 +18,28 @@ function makeSourcePdf() {
     doc.font("Helvetica").fontSize(10).text("Built applications with JavaScript, React and Node.js.", 42, 125);
     doc.end();
   });
+}
+
+async function parseGeneratedPdf(buffer) {
+  const document = await pdfjs.getDocument({
+    data: new Uint8Array(buffer),
+    useSystemFonts: true,
+    disableFontFace: true,
+    isEvalSupported: false,
+    verbosity: 0
+  }).promise;
+
+  const pages = [];
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const text = await page.getTextContent();
+    pages.push(text.items.map((item) => item.str).join(" "));
+    page.cleanup();
+  }
+
+  const result = { text: pages.join("\\n"), numpages: document.numPages };
+  await document.destroy();
+  return result;
 }
 
 const data = {
@@ -55,7 +77,7 @@ test("exports an ATS-readable PDF using the source page dimensions", async () =>
   assert.ok(Buffer.isBuffer(buffer));
   assert.equal(buffer.subarray(0, 4).toString("ascii"), "%PDF");
 
-  const parsed = await pdfParse(buffer);
+  const parsed = await parseGeneratedPdf(buffer);
   assert.match(parsed.text, /Bucksmon/);
   assert.match(parsed.text, /RELEVANT SKILLS/i);
   assert.match(parsed.text, /JavaScript/);

@@ -8,7 +8,7 @@ Upload a PDF, DOCX, or legacy DOC resume, paste a job description, review the ke
 
 - **Frontend:** Plain HTML, CSS and JavaScript hosted on GitHub Pages.
 - **Backend:** Node.js and Express hosted on Render.
-- **Resume parsing:** `pdf-parse`, `mammoth`, and `word-extractor`.
+- **Resume parsing:** `pdfjs-dist`, `mammoth`, and `word-extractor`.
 - **PDF export:** `pdfkit` with `pdfjs-dist` template inspection.
 - **Analysis:** Transparent keyword matching and resume evidence selection. No ML model or external AI API is required.
 
