@@ -116,17 +116,15 @@ function renderResults(payload) {
 
   document.querySelector("#score-description").textContent =
     analysis.score === null
-      ? "The scanner did not find enough recognised role-specific terms to calculate a useful estimate."
+      ? "No recognised role-specific terms were found in the job title or description. Add the technologies, responsibilities or qualifications listed by the employer."
       : analysis.score === 0
-        ? analysis.resumeKeywordCount === 0
-          ? "We extracted resume text but could not recognise any skills from our current keyword library. Check that your resume text is selectable and review the skills list manually."
-          : `We recognised ${analysis.resumeKeywordCount} resume terms and ${analysis.jobKeywordCount} job-description terms, but found no exact keyword overlap. Related wording may still describe the same skill.`
-        : `Found ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job-description keywords in your resume.`;
+        ? `No direct overlap was found. We identified ${analysis.resumeKeywordCount} skills in your CV and ${analysis.jobKeywordCount} recognised job-description terms. Review the evidence and gaps below; related wording may still describe the same capability.`
+        : `Matched ${analysis.matchedKeywords.length} of ${analysis.jobKeywordCount} recognised job-description terms. We also identified ${analysis.resumeKeywordCount} skills and technologies in your CV.`;
 
-  document.querySelector("#matched-count").textContent = analysis.matchedKeywords.length;
+  document.querySelector("#matched-count").textContent = analysis.resumeKeywordCount;
   document.querySelector("#missing-count").textContent = analysis.missingKeywords.length;
 
-  addTags(document.querySelector("#matched-list"), analysis.matchedKeywords);
+  addTags(document.querySelector("#matched-list"), analysis.resumeKeywords);
   addTags(document.querySelector("#missing-list"), analysis.missingKeywords, true);
 
   const evidenceList = document.querySelector("#evidence-list");
@@ -134,7 +132,7 @@ function renderResults(payload) {
 
   if (!analysis.evidence.length) {
     const item = document.createElement("li");
-    item.textContent = "No matching evidence lines were found. Review your experience and project sections manually.";
+    item.textContent = "No achievement-style lines could be confidently extracted. Review your experience and project sections manually.";
     evidenceList.append(item);
   } else {
     for (const evidence of analysis.evidence) {

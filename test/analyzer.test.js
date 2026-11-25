@@ -178,3 +178,45 @@ test("builds a truthful profile summary when the job description has no exact ke
   assert.match(result.summaryDraft, /Puppeteer/);
   assert.doesNotMatch(result.summaryDraft, /Kubernetes|distributed systems experience/i);
 });
+
+test("recognises the generic Software Engineer description and still returns source CV skills and evidence", () => {
+  const resume = [
+    "FURQAN NADIR",
+    "EXPERIENCE",
+    "Web Developer Intern",
+    "Marketist",
+    "- Optimized the mockup generator's load time and UI responsiveness, serving 40-50 daily active users, resulting in 25% faster page loads.",
+    "- Built and deployed a Puppeteer-based screenshot and video generation service for automated website previews, while maintaining service availability during development and deployment.",
+    "- Developed a dynamically configurable CGPA calculator supporting multiple university grading policies.",
+    "EDUCATION",
+    "BSc Software Engineering",
+    "PROJECTS",
+    "- Created a full-stack marketplace for GTA World, supporting 60+ registered users to list and purchase items.",
+    "SKILLS & AWARDS",
+    "Technical Skills: C++, Python, JavaScript, AutoHotkey (AHK), HTML, CSS, Angular, React Native, Node.js, Express.js, Puppeteer, REST APIs, JWT, MongoDB, Supabase, React, TypeScript"
+  ].join("\n");
+
+  const description = [
+    "Collaborate to design, develop, and implement high-quality software solutions that operate 24/7.",
+    "Write clean, efficient, and maintainable code that can outlive the developer.",
+    "Troubleshoot, debug, and resolve software defects and issues.",
+    "Stay up-to-date with the latest industry trends and technologies to ensure our software remains cutting-edge."
+  ].join("\n");
+
+  const result = analyzeResume({
+    resumeText: resume,
+    jobDescription: description,
+    jobTitle: "Software Engineer"
+  });
+
+  assert.ok(result.jobKeywords ?? result.jobKeywordCount >= 5);
+  assert.ok(result.jobKeywordCount >= 5);
+  assert.ok(result.resumeKeywords.includes("JavaScript"));
+  assert.ok(result.resumeKeywords.includes("Node.js"));
+  assert.ok(result.resumeKeywords.includes("MongoDB"));
+  assert.ok(result.matchedKeywords.includes("Software Development"));
+  assert.ok(result.evidence.some((line) => /25% faster page loads/.test(line)));
+  assert.ok(result.evidence.some((line) => /Puppeteer-based screenshot/.test(line)));
+  assert.match(result.summaryDraft, /Software Engineering graduate/);
+  assert.match(result.summaryDraft, /JavaScript/);
+});
