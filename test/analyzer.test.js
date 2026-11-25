@@ -250,3 +250,48 @@ test("builds manual CV edits from the supplied resume and keeps unsupported job 
   assert.ok(result.suggestedEdits.termsToVerify.includes("Docker"));
   assert.doesNotMatch(result.suggestedEdits.skillsText, /Docker/);
 });
+
+test("generates sentence drafts containing missing keywords and marks them for verification", () => {
+  const result = analyzeResume({
+    resumeText: [
+      "FURQAN NADIR",
+      "EXPERIENCE",
+      "Web Developer Intern",
+      "Marketist",
+      "- Optimized the mockup generator load time, resulting in 25% faster page loads.",
+      "PROJECTS",
+      "GrabNGo",
+      "- Developed a self-checkout application using React Native, Node.js and MongoDB.",
+      "SKILLS & AWARDS",
+      "Technical Skills: JavaScript, React Native, Node.js, MongoDB"
+    ].join("\n"),
+    jobDescription: [
+      "Required qualifications:",
+      "- Experience with Docker and debugging.",
+      "Preferred:",
+      "- Knowledge of maintainable code and collaboration."
+    ].join("\n"),
+    jobTitle: "Software Engineer"
+  });
+
+  const drafts = result.suggestedEdits.keywordBulletDrafts;
+  assert.ok(drafts.some((draft) => draft.keyword === "Docker"));
+  assert.ok(drafts.some((draft) => draft.keyword === "Debugging"));
+  assert.ok(drafts.some((draft) => draft.keyword === "Code Quality"));
+  assert.ok(drafts.some((draft) => draft.keyword === "Collaboration"));
+
+  for (const draft of drafts) {
+    assert.equal(draft.requiresVerification, true);
+    assert.ok(draft.text.includes("["));
+    assert.ok(draft.text.includes("]"));
+    assert.ok(draft.text.length > 40);
+  }
+
+  const docker = drafts.find((draft) => draft.keyword === "Docker");
+  const debugging = drafts.find((draft) => draft.keyword === "Debugging");
+  assert.match(docker.text, /Docker/);
+  assert.match(docker.text, /\[application\/service\]/);
+  assert.equal(docker.priority, "Required");
+  assert.match(debugging.text, /Debugged/);
+  assert.equal(drafts.find((draft) => draft.keyword === "Code Quality").priority, "Preferred");
+});
