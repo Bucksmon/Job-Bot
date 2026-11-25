@@ -251,6 +251,27 @@ test("builds manual CV edits from the supplied resume and keeps unsupported job 
   assert.doesNotMatch(result.suggestedEdits.skillsText, /Docker/);
 });
 
+test("classifies preferred and required keyword aliases by their original phrases", () => {
+  const result = analyzeResume({
+    resumeText: "JavaScript and Node.js",
+    jobDescription: [
+      "Required qualifications:",
+      "- Experience with Docker and debugging.",
+      "Preferred:",
+      "- Knowledge of maintainable code and collaboration."
+    ].join("\n"),
+    jobTitle: "Software Engineer"
+  });
+
+  assert.ok(result.missingRequired.includes("Docker"));
+  assert.ok(result.missingRequired.includes("Debugging"));
+  assert.ok(result.missingPreferred.includes("Code Quality"));
+  assert.ok(result.missingPreferred.includes("Collaboration"));
+  const drafts = result.suggestedEdits.keywordBulletDrafts;
+  assert.equal(drafts.find((draft) => draft.keyword === "Code Quality").priority, "Preferred");
+  assert.equal(drafts.find((draft) => draft.keyword === "Docker").priority, "Required");
+});
+
 test("generates sentence drafts containing missing keywords and marks them for verification", () => {
   const result = analyzeResume({
     resumeText: [
