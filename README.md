@@ -90,7 +90,6 @@ The website includes a simple live job search that queries a curated list of pub
 
 PDF text is reconstructed from its text-run coordinates so words in separate visual runs (for example a job title and right-aligned date) are separated correctly. The analysis response also returns document-readability checks for extracted text, contact details, standard sections, dates, layout and achievement bullets. These are practical diagnostics, not a score from any employer's ATS.
 
-
 ## Applying suggested CV edits
 
-The app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.\n
+The app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.
