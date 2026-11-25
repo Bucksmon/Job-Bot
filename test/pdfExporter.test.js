@@ -37,9 +37,7 @@ async function parseGeneratedPdf(buffer) {
     page.cleanup();
   }
 
-  const result = { text: pages.join("\\n"), numpages: document.numPages };
-  await document.destroy();
-  return result;
+  return { text: pages.join("\n"), numpages: document.numPages };
 }
 
 const data = {
@@ -93,7 +91,7 @@ test("never inserts a missing skill that is not in the supplied resume", async (
     matchedKeywords: ["JavaScript", "Docker"],
     resumeKeywords: ["JavaScript", "React", "Node.js", "MongoDB"]
   }, source);
-  const parsed = await pdfParse(buffer);
+  const parsed = await parseGeneratedPdf(buffer);
 
   assert.doesNotMatch(parsed.text, /Docker/);
 });
