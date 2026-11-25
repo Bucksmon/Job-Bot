@@ -89,6 +89,4 @@ The website includes a simple live job search that queries a curated list of pub
 ## Resume parsing and ATS checks
 
 PDF text is reconstructed from its text-run coordinates so words in separate visual runs (for example a job title and right-aligned date) are separated correctly. The analysis response also returns document-readability checks for extracted text, contact details, standard sections, dates, layout and achievement bullets. These are practical diagnostics, not a score from any employer's ATS.
-
-Tailored PDF exports preserve the source PDF's page dimensions and typography scale where inspectable, but rebuild content into a searchable text layout. Complex source columns may be linearised. A 100% ATS score cannot be guaranteed across different applicant tracking systems; only information supported by the resume is promoted into the tailored version.
 \n## Applying suggested CV edits\n\nThe app provides separate copy-ready fields for a professional summary, skills already detected in the resume, and existing work/project bullets to prioritise. It also lists unrecognised job-description terms for manual verification. Missing terms are not automatically written into the CV: only add them when supported by genuine skills or experience. The app does not generate or export a replacement resume file.\n
