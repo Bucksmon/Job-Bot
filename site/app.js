@@ -176,15 +176,7 @@ function renderResults(payload) {
     (suggestions.experienceBullets || []).map((line) => "- " + line).join("\n");
   document.querySelector("#projects-draft").value =
     (suggestions.projectBullets || []).map((line) => "- " + line).join("\n");
-  const keywordDrafts = suggestions.keywordBulletDrafts || [];
-  document.querySelector("#keyword-bullets-draft").value = keywordDrafts.length
-    ? keywordDrafts.map((draft) => "- " + draft.text).join("\n")
-    : "No recognised missing job keywords were found. Review the matched terms and existing evidence above.";
-  addTags(
-    document.querySelector("#verify-terms"),
-    keywordDrafts.map((draft) => draft.priority + " · " + draft.keyword),
-    true
-  );
+  addTags(document.querySelector("#verify-terms"), suggestions.termsToVerify || [], true);
   document.querySelector("#method-note").textContent = analysis.notes.join(" ");
   resultsSection.hidden = false;
   resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
